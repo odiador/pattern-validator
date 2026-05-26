@@ -100,6 +100,39 @@ Implementar una aplicación web que permita **extraer** y **validar** patrones f
     )
 
     st.markdown(
+        """
+### Expresiones Regulares Utilizadas (Motor Regex)
+
+Para el motor alternativo basado en expresiones regulares (`core/regex_core.py`), se definen y aplican los siguientes patrones para validación completa:
+
+- **Correo Electrónico**:
+  ```regex
+  ^[A-Za-z0-9][A-Za-z0-9._-]*@[A-Za-z0-9-]+(?:\.[A-Za-z]{2,24})+$
+  ```
+- **Teléfono (Colombia)**:
+  ```regex
+  ^(?:\\+57\\s?)?(?:\\(3\\d{2}\\)|3\\d{2})[\\s.-]?\\d{3}[\\s.-]?(?:\\d{2}[\\s.-]?\\d{2}|\\d{4})$
+  ```
+- **Fecha (estricta de 10 caracteres)**:
+  ```regex
+  ^(\\d{2})([/-])(\\d{2})\\2(\\d{4})$
+  ```
+- **URL (con soporte IP y localhost)**:
+  ```regex
+  ^https?://(localhost|(?:\\d{1,3}\\.){3}\\d{1,3}|(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,24})(?::\\d{1,5})?(?:/[^\\s]*)?$
+  ```
+- **Placa**:
+  ```regex
+  ^[A-Za-z]{3}-?(?:\\d{3}|\\d{2}[A-Za-z])$
+  ```
+- **Contraseña**:
+  ```regex
+  ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9])\\S{8,32}$
+  ```
+"""
+    )
+
+    st.markdown(
        f"""
 ## Código fuente organizado
 
@@ -156,8 +189,13 @@ Para evidenciar el Módulo B:
     ])
 
     with tab_correo:
-        st.markdown("### Autómata de Correo Electrónico")
+        st.markdown("### Correo Electrónico")
         st.caption("Valida un formato estándar usuario@dominio.extension con soporte de subdominios y extensión de 2 a 24 caracteres.")
+        
+        st.markdown("**Expresión regular equivalente (Motor Regex):**")
+        st.code(r"^[A-Za-z0-9][A-Za-z0-9._-]*@[A-Za-z0-9-]+(?:\.[A-Za-z]{2,24})+$", language="regex")
+        
+        st.markdown("**Representación visual del Autómata (FSM):**")
         dot_correo = """digraph CorreoFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -185,8 +223,13 @@ Para evidenciar el Módulo B:
         st.graphviz_chart(dot_correo)
 
     with tab_telefono:
-        st.markdown("### Autómata de Teléfono (Colombia)")
+        st.markdown("### Teléfono (Colombia)")
         st.caption("Valida números de teléfono en Colombia de forma estructurada: opcional prefijo +57 o (+57), seguido opcionalmente de un código de área entre paréntesis (3XX) o sin ellos 3XX, separadores estructurados de grupos [espacio, punto o guion] y una división final opcional (DD-DD).")
+        
+        st.markdown("**Expresión regular equivalente (Motor Regex):**")
+        st.code(r"^(?:\+57\s?)?(?:\(3\d{2}\)|3\d{2})[\s.-]?\d{3}[\s.-]?(?:\d{2}[\s.-]?\d{2}|\d{4})$", language="regex")
+        
+        st.markdown("**Representación visual del Autómata (FSM):**")
         dot_telefono = """digraph TelefonoColFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -274,8 +317,13 @@ Para evidenciar el Módulo B:
         st.graphviz_chart(dot_telefono)
 
     with tab_url:
-        st.markdown("### Autómata de URL")
+        st.markdown("### URL")
         st.caption("Valida URLs con protocolo http:// o https://, soportando localhost, direcciones IP válidas (octetos <= 255) o dominios con TLD alfabético (2-24).")
+        
+        st.markdown("**Expresión regular equivalente (Motor Regex):**")
+        st.code(r"^https?://(localhost|(?:\d{1,3}\.){3}\d{1,3}|(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,24})(?::\d{1,5})?(?:/[^\s]*)?$", language="regex")
+        
+        st.markdown("**Representación visual del Autómata (FSM):**")
         dot_url = """digraph UrlFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -302,8 +350,13 @@ Para evidenciar el Módulo B:
         st.graphviz_chart(dot_url)
 
     with tab_fecha:
-        st.markdown("### Autómata de Fecha")
-        st.caption("Acepta fechas en formato DD/MM/AAAA o DD-MM-AAAA, admitiendo paréntesis balanceados. Las transiciones de paréntesis '(' y ')' se representan como bucles sobre los estados correspondientes, y adicionalmente el autómata evalúa la cantidad de días del mes e inclusive años bisiestos bifurcando a un estado de rechazo o aceptación.")
+        st.markdown("### Fecha")
+        st.caption("Acepta fechas en formato DD/MM/AAAA o DD-MM-AAAA. El autómata evalúa la cantidad de días del mes e inclusive años bisiestos bifurcando a un estado de rechazo o aceptación.")
+        
+        st.markdown("**Expresión regular equivalente (Motor Regex):**")
+        st.code(r"^(\d{2})([/-])(\d{2})\2(\d{4})$", language="regex")
+        
+        st.markdown("**Representación visual del Autómata (FSM):**")
         dot_fecha = """digraph FechaFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -335,27 +388,18 @@ Para evidenciar el Módulo B:
 
  q10 -> q_val [label="[Calendario Valido]\\n(días <= max_mes, bisiestos)"];
  q10 -> q_rej [label="[Calendario Invalido]\\n(ej: 31/04/2025 o 29/02/2023)"];
-
- // Autoreferencias para paréntesis balanceados
- q0 -> q0 [label="("];
- q1 -> q1 [label="( | )"];
- q2 -> q2 [label="( | )"];
- q3 -> q3 [label="( | )"];
- q4 -> q4 [label="( | )"];
- q5 -> q5 [label="( | )"];
- q6 -> q6 [label="( | )"];
- q7 -> q7 [label="( | )"];
- q8 -> q8 [label="( | )"];
- q9 -> q9 [label="( | )"];
- q10 -> q10 [label="( | )"];
- q_val -> q_val [label=")"];
 }
 """
         st.graphviz_chart(dot_fecha)
 
     with tab_placa:
-        st.markdown("### Autómata de Placas")
+        st.markdown("### Placas")
         st.caption("Acepta formatos LLL-000, LLL000, LLL-00L, LLL00L. L = Letra, D = Dígito.")
+        
+        st.markdown("**Expresión regular equivalente (Motor Regex):**")
+        st.code(r"^[A-Za-z]{3}-?(?:\d{3}|\d{2}[A-Za-z])$", language="regex")
+        
+        st.markdown("**Representación visual del Autómata (FSM):**")
         dot_placa = """digraph PlacaFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -384,8 +428,13 @@ Para evidenciar el Módulo B:
         st.graphviz_chart(dot_placa)
 
     with tab_pass:
-        st.markdown("### Autómata de Contraseña")
+        st.markdown("### Contraseña")
         st.caption("Valida la longitud mínima (8-32 caracteres), prohíbe espacios y valida la presencia de mayúsculas, minúsculas, dígitos y caracteres especiales.")
+        
+        st.markdown("**Expresión regular equivalente (Motor Regex):**")
+        st.code(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{8,32}$", language="regex")
+        
+        st.markdown("**Representación visual del Autómata (FSM):**")
         dot_pass = """digraph PasswordFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];

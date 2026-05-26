@@ -59,20 +59,7 @@ def validar_fecha(fecha: str) -> bool:
     if not fecha:
         return False
 
-    # Validar que los paréntesis estén balanceados
-    abiertos = 0
-    for c in fecha:
-        if c == "(":
-            abiertos += 1
-        elif c == ")":
-            abiertos -= 1
-            if abiertos < 0:
-                return False
-    if abiertos != 0:
-        return False
-
-    fecha_limpia = "".join(c for c in fecha if c not in ["(", ")"])
-    m = _FECHA_RE.fullmatch(fecha_limpia.strip())
+    m = _FECHA_RE.fullmatch(fecha.strip())
     if not m:
         return False
 

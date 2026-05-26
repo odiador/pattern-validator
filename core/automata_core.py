@@ -66,24 +66,12 @@ def validar_correo(correo: str) -> bool:
 
 
 def validar_fecha(fecha: str) -> bool:
-    """Valida fechas en formato DD/MM/AAAA o DD-MM-AAAA usando una FSM pura caracter por caracter, admitiendo parentesis."""
+    """Valida fechas en formato DD/MM/AAAA o DD-MM-AAAA usando una FSM pura caracter por caracter."""
     if not fecha:
         return False
 
-    # Validar que los paréntesis estén balanceados
-    abiertos = 0
-    for c in fecha:
-        if c == "(":
-            abiertos += 1
-        elif c == ")":
-            abiertos -= 1
-            if abiertos < 0:
-                return False
-    if abiertos != 0:
-        return False
-
-    fecha_limpia = "".join(c for c in fecha if c not in ["(", ")"])
-    if len(fecha_limpia) != 10:
+    fecha_val = fecha.strip()
+    if len(fecha_val) != 10:
         return False
 
     estado = "q0"
@@ -93,7 +81,7 @@ def validar_fecha(fecha: str) -> bool:
     m1, m2 = "", ""
     y1, y2, y3, y4 = "", "", "", ""
 
-    for char in fecha_limpia:
+    for char in fecha_val:
         if estado == "q0":
             if _es_digito_ascii(char):
                 d1 = char

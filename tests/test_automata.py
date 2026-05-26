@@ -25,15 +25,19 @@ def test_validar_correo(correo, esperado):
     ("12/05/2026", True),
     ("01-01-2000", True),
     ("29/02/2024", True),
-    ("(29/02/2024)", True),
-    ("29/(02)/2024", True),
-    ("(29-02-2024)", True),
-    ("29/02/(2024)", True),
+    ("(29/02/2024)", False),
+    ("29/(02)/2024", False),
+    ("(29-02-2024)", False),
+    ("29/02/(2024)", False),
     ("32/01/2024", False),
     ("29/02/2023", False),
     ("01/01/99", False),
     ("aa/bb/cccc", False),
     ("(29/02/2024", False),
+    ("31/04/2025", False),  # Abril tiene 30 días
+    ("00/02/2024", False),  # Día 0 es inválido
+    ("15/00/2024", False),  # Mes 0 es inválido
+    ("15/13/2024", False),  # Mes 13 es inválido
 ])
 def test_validar_fecha(fecha, esperado):
     assert validar_fecha(fecha) == esperado

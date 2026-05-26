@@ -192,22 +192,14 @@ def _hints(campo_key: str, valor: str) -> list[str]:
         return hints
 
     if campo_key == "fecha":
-        # Validar balance de paréntesis en la vista previa del formulario
-        abiertos = 0
-        for c in valor:
-            if c == "(":
-                abiertos += 1
-            elif c == ")":
-                abiertos -= 1
-                if abiertos < 0:
-                    hints.append("parentesis no estan balanceados")
-                    return hints
-        if abiertos != 0:
-            hints.append("parentesis no estan balanceados")
+        if "(" in valor or ")" in valor:
+            hints.append("no se permiten parentesis en la fecha")
             return hints
         
-        # Analizar el contenido sin paréntesis
-        valor_limpio = "".join(c for c in valor if c not in ["(", ")"])
+        valor_limpio = valor.strip()
+        
+        if len(valor_limpio) != 10:
+            hints.append("debe tener exactamente 10 caracteres (formato DD/MM/AAAA o DD-MM-AAAA)")
         
         if "/" not in valor_limpio and "-" not in valor_limpio:
             hints.append("use separador '/' o '-'")
@@ -224,24 +216,29 @@ def _hints(campo_key: str, valor: str) -> list[str]:
             hints.append("use solo numeros en dia/mes/anio")
             return hints
             
+        if len(d) != 2:
+            hints.append("dia debe tener 2 digitos")
+        if len(m) != 2:
+            hints.append("mes debe tener 2 digitos")
         if len(a) != 4:
             hints.append("anio debe tener 4 digitos")
             
         # Validación de rango numérico coherente con calendario
-        d_i, m_i, a_i = int(d), int(m), int(a)
-        if m_i < 1 or m_i > 12:
-            hints.append("mes debe estar entre 01 y 12")
-        if d_i < 1:
-            hints.append("dia debe ser mayor a 0")
-            
-        if 1 <= m_i <= 12 and d_i >= 1:
-            def es_bisiesto(valor_anio: int) -> bool:
-                return (valor_anio % 4 == 0 and valor_anio % 100 != 0) or (valor_anio % 400 == 0)
-            dias_por_mes = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-            if m_i == 2 and es_bisiesto(a_i):
-                dias_por_mes[1] = 29
-            if d_i > dias_por_mes[m_i - 1]:
-                hints.append(f"dia invalido para el mes especificado (max {dias_por_mes[m_i - 1]} dias)")
+        if d.isdigit() and m.isdigit() and a.isdigit():
+            d_i, m_i, a_i = int(d), int(m), int(a)
+            if m_i < 1 or m_i > 12:
+                hints.append("mes debe estar entre 01 y 12")
+            if d_i < 1:
+                hints.append("dia debe ser mayor a 0")
+                
+            if 1 <= m_i <= 12 and d_i >= 1:
+                def es_bisiesto(valor_anio: int) -> bool:
+                    return (valor_anio % 4 == 0 and valor_anio % 100 != 0) or (valor_anio % 400 == 0)
+                dias_por_mes = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+                if m_i == 2 and es_bisiesto(a_i):
+                    dias_por_mes[1] = 29
+                if d_i > dias_por_mes[m_i - 1]:
+                    hints.append(f"dia invalido para el mes especificado (max {dias_por_mes[m_i - 1]} dias)")
         return hints
 
     return hints
@@ -292,29 +289,136 @@ def render_feedback(campo_key: str, valor: str, validador) -> None:
         st.markdown("\n".join([f"- {f}" for f in faltantes]))
 
 
+EJEMPLOS_FORM = {
+    "(Ninguno)": {
+        "correo": "",
+        "telefono": "",
+        "fecha": "",
+        "url": "",
+        "placa": "",
+        "contrasena": ""
+    },
+    "Ejemplos Válidos": {
+        "correo": "juan.amador@example.com",
+        "telefono": "+57 (312) 555-0199",
+        "fecha": "29/02/2024",
+        "url": "https://www.uq.edu.co",
+        "placa": "ABC-123",
+        "contrasena": "Secure123!"
+    },
+    "Ejemplos Inválidos": {
+        "correo": "juan.amador@",
+        "telefono": "123456789",
+        "fecha": "31/04/2025",
+        "url": "http://invalid-ip:99999",
+        "placa": "AB-12",
+        "contrasena": "short"
+    },
+    "Ejemplos Mezclados / Extraños": {
+        "correo": "valeria.fz@uq.edu.co",
+        "telefono": "320-555-0123",
+        "fecha": "26-05-2026",
+        "url": "http://localhost:8080/health",
+        "placa": "AAA00C",
+        "contrasena": "P@ssw0rd2026"
+    },
+    "Caso Límite 1: Años Bisiestos y Separador '-'": {
+        "correo": "bisiesto.test@domain.com",
+        "telefono": "3001234567",
+        "fecha": "29-02-2024",
+        "url": "http://localhost:3000",
+        "placa": "AAA-00C",
+        "contrasena": "LeapYear2024!"
+    },
+    "Caso Límite 2: IPs Extremas y Placas LLL000": {
+        "correo": "ip.tester@sub.domain.co",
+        "telefono": "+573123456789",
+        "fecha": "31/12/1999",
+        "url": "https://255.255.255.255:443/path",
+        "placa": "XYZ987",
+        "contrasena": "P@ssw0rd9999!"
+    },
+    "Caso Inválido 1: Teléfonos con letras / URL sin Protocolo": {
+        "correo": "user@domain",
+        "telefono": "312abc4567",
+        "fecha": "30/02/2024",
+        "url": "google.com",
+        "placa": "ABC-1234",
+        "contrasena": "short"
+    },
+    "Caso Inválido 2: Fechas del Calendario inexistentes": {
+        "correo": "@domain.com",
+        "telefono": "2123456789",
+        "fecha": "31/11/2026",
+        "url": "http://256.0.0.1",
+        "placa": "123-ABC",
+        "contrasena": "password_sin_especial_ni_mayuscula1"
+    }
+}
+
+
+def _on_ejemplo_form_change():
+    sel = st.session_state.get("sel_ejemplo_form", "(Ninguno)")
+    valores = EJEMPLOS_FORM.get(sel, {})
+    for key, val in valores.items():
+        st.session_state[key] = val
+        if "touched" in st.session_state:
+            st.session_state["touched"][key] = bool(val)
+        if "_prev_values" in st.session_state:
+            st.session_state["_prev_values"][key] = val
+
+
+with st.expander("Valores de ejemplo (para sustentación)", expanded=True):
+    categoria_form = st.selectbox(
+        "Escenarios de prueba para el formulario",
+        list(EJEMPLOS_FORM.keys()),
+        key="sel_ejemplo_form",
+        on_change=_on_ejemplo_form_change,
+    )
+    if st.button("Cargar / Reiniciar escenario"):
+        _on_ejemplo_form_change()
+
+
 st.subheader("Datos de entrada")
 
-col1, col2 = st.columns(2, gap="large")
+# Fila 1: Correo y Teléfono
+row1_col1, row1_col2 = st.columns(2, gap="large")
+with row1_col1:
+    with st.container(border=True):
+        st.markdown("##### Correo electrónico")
+        correo = st.text_input("Correo electrónico", key="correo", label_visibility="collapsed")
+        render_feedback("correo", correo, validadores["correo"])
+with row1_col2:
+    with st.container(border=True):
+        st.markdown("##### Teléfono")
+        telefono = st.text_input("Teléfono", key="telefono", label_visibility="collapsed")
+        render_feedback("telefono", telefono, validadores["telefono"])
 
-with col1:
-    correo = st.text_input("Correo electronico", key="correo")
-    render_feedback("correo", correo, validadores["correo"])
+# Fila 2: Fecha y URL
+row2_col1, row2_col2 = st.columns(2, gap="large")
+with row2_col1:
+    with st.container(border=True):
+        st.markdown("##### Fecha (DD/MM/AAAA o DD-MM-AAAA)")
+        fecha = st.text_input("Fecha", key="fecha", label_visibility="collapsed")
+        render_feedback("fecha", fecha, validadores["fecha"])
+with row2_col2:
+    with st.container(border=True):
+        st.markdown("##### URL (http o https)")
+        url = st.text_input("URL", key="url", label_visibility="collapsed")
+        render_feedback("url", url, validadores["url"])
 
-    telefono = st.text_input("Telefono", key="telefono")
-    render_feedback("telefono", telefono, validadores["telefono"])
-
-    fecha = st.text_input("Fecha (DD/MM/AAAA o DD-MM-AAAA)", key="fecha")
-    render_feedback("fecha", fecha, validadores["fecha"])
-
-with col2:
-    url = st.text_input("URL (http o https)", key="url")
-    render_feedback("url", url, validadores["url"])
-
-    placa = st.text_input("Placa de vehiculo", key="placa")
-    render_feedback("placa", placa, validadores["placa"])
-
-    password = st.text_input("Contrasena", type="password", key="contrasena")
-    render_feedback("contrasena", password, validadores["contrasena"])
+# Fila 3: Placa y Contraseña
+row3_col1, row3_col2 = st.columns(2, gap="large")
+with row3_col1:
+    with st.container(border=True):
+        st.markdown("##### Placa de vehículo")
+        placa = st.text_input("Placa de vehículo", key="placa", label_visibility="collapsed")
+        render_feedback("placa", placa, validadores["placa"])
+with row3_col2:
+    with st.container(border=True):
+        st.markdown("##### Contraseña")
+        password = st.text_input("Contraseña", type="password", key="contrasena", label_visibility="collapsed")
+        render_feedback("contrasena", password, validadores["contrasena"])
 
 resultados = [
     evaluar(key, st.session_state.get(key, ""), validador, st.session_state["touched"].get(key, False))

@@ -393,14 +393,14 @@ Lógica Secuencial:
                 <h3 class="highlight">Autómata de Fechas</h3>
             <div class="fsm-box">
 Estados y Transición Secuencial (FSM pura):
-- q0: Estado inicial. Admite '(' vía bucle.
-- q_d1, q_d2: Estados para leer los dos dígitos del día (DD). Admite '(' y ')' en bucle.
+- q0: Estado inicial.
+- q_d1, q_d2: Estados para leer los dos dígitos del día (DD).
 - q_s1: Estado tras leer el separador '/' o '-'.
-- q_m1, q_m2: Estados para leer los dos dígitos del mes (MM). Admite '(' y ')' en bucle.
+- q_m1, q_m2: Estados para leer los dos dígitos del mes (MM).
 - q_s2: Estado tras leer el segundo separador (debe coincidir con el primero).
 - q_y1 a q_y4: Estados secuenciales para los cuatro dígitos del año (AAAA).
-- q_y4 (q10): Estado de Aceptación final. Admite ')' vía bucle.
-* Nota: Se permite el uso de paréntesis '(' y ')' en cualquier posición siempre que estén correctamente balanceados. El motor valida adicionalmente que la cantidad de días sea correcta según el mes y si el año es bisiesto.
+- q_y4 (q10): Estado de Aceptación final.
+* Nota: El motor valida adicionalmente que la cantidad de días sea correcta según el mes y si el año es bisiesto.
             </div>
             <h4>Diagrama de Transición (DFA Fecha)</h4>
             <div class="diagram-container">
@@ -425,12 +425,6 @@ Estados y Transición Secuencial (FSM pura):
  
                   <!-- Indicador de Inicio -->
                   <path d="M 15 70 L 30 70" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
- 
-                  <!-- Bucles de Paréntesis -->
-                  <path d="M 45 56 A 8 8 0 1 1 55 56" fill="none" stroke="#2563eb" stroke-width="1.5" /><text x="50" y="42" font-family="sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">(</text>
-                  <path d="M 285 56 A 8 8 0 1 1 295 56" fill="none" stroke="#2563eb" stroke-width="1.5" /><text x="290" y="42" font-family="sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">( | )</text>
-                  <path d="M 525 56 A 8 8 0 1 1 535 56" fill="none" stroke="#2563eb" stroke-width="1.5" /><text x="530" y="42" font-family="sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">( | )</text>
-                  <path d="M 845 56 A 8 8 0 1 1 855 56" fill="none" stroke="#22c55e" stroke-width="1.5" /><text x="850" y="42" font-family="sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">)</text>
  
                   <!-- Nodos / Estados -->
                   <circle cx="50" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="50" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q0</text>
