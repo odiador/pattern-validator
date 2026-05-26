@@ -4,8 +4,6 @@ import streamlit as st
 from core import automata_core as fsm
 from core import regex_core as regex
 
-st.set_page_config(page_title="Validacion de formularios", layout="wide")
-
 st.title("Modulo B: Validacion de formularios")
 
 st.markdown(

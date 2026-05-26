@@ -4,8 +4,6 @@ import streamlit as st
 from core.text_pipeline import analizar_texto as analizar_texto_fsm
 from core.regex_core import analizar_texto as analizar_texto_regex
 
-st.set_page_config(page_title="Analizador de textos", layout="wide")
-
 st.title("Modulo A: Analisis de textos")
 
 st.markdown(
