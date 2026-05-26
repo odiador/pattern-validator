@@ -75,7 +75,7 @@ Implementar una aplicación web que permita **extraer** y **validar** patrones f
   - Prueba validadores en orden (más específicos → más generales) para evitar ambigüedades.
 
 **Salida**
-- Tabla con pares `{tipo, valor}` y un resumen por tipo.
+- Tabla con pares `{{tipo, valor}}` y un resumen por tipo.
 
 #### Vista 3: Módulo B — Validación de formularios (`pages/2_formularios.py`)
 
