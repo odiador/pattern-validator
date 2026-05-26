@@ -61,8 +61,11 @@ def test_validar_url(url, esperado):
 @pytest.mark.parametrize("placa, esperado", [
     ("ABC-123", True),
     ("XYZ987", True),
+    ("AAA00C", True),
+    ("AAA-00C", True),
     ("AB-123", False),
     ("ABC-12", False),
+    ("AAA-0BC", False),
     ("123-ABC", False),
     ("ABCD123", False),
 ])

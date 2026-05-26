@@ -16,7 +16,7 @@ import re
 
 
 _EMAIL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*@[A-Za-z0-9-]+(?:\.[A-Za-z]{2,24})+$")
-_PLACA_RE = re.compile(r"^[A-Za-z]{3}-?\d{3}$")
+_PLACA_RE = re.compile(r"^[A-Za-z]{3}-?(?:\d{3}|\d{2}[A-Za-z])$")
 _PASSWORD_RE = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{8,32}$")
 _FECHA_RE = re.compile(r"^(\d{2})([/-])(\d{2})\2(\d{4})$")
 
@@ -122,7 +122,7 @@ def analizar_texto(texto: str) -> List[Dict[str, str]]:
             re.compile(r"\b[A-Za-z0-9][A-Za-z0-9._-]*@[A-Za-z0-9-]+(?:\.[A-Za-z]{2,24})+\b"),
             validar_correo,
         ),
-        ("placa", re.compile(r"\b[A-Za-z]{3}-?\d{3}\b"), validar_placa),
+        ("placa", re.compile(r"\b[A-Za-z]{3}-?(?:\d{3}|\d{2}[A-Za-z])\b"), validar_placa),
         ("telefono", re.compile(r"\+?\d[\d\s().\-]{6,}\d"), validar_telefono),
     ]
 

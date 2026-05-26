@@ -72,8 +72,8 @@ REGLAS = {
         "Opcional: puerto (ej: :8080) y ruta",
     ],
     "placa": [
-        "Formato: LLL-000 o LLL000",
-        "3 letras seguidas de 3 digitos",
+        "Formato: LLL-000, LLL000, LLL-00L o LLL00L",
+        "3 letras seguidas de 2 digitos y (digito o letra) al final",
     ],
     "contrasena": [
         "Longitud: 8 a 32 caracteres",
@@ -154,11 +154,32 @@ def _hints(campo_key: str, valor: str) -> list[str]:
 
     if campo_key == "placa":
         v = valor.strip().upper()
+
+        if len(v) < 6:
+            hints.append("use formato LLL000, LLL-000, LLL00L o LLL-00L")
+            return hints
+
         if len(v) >= 3 and not all(c.isalpha() for c in v[:3]):
             hints.append("las primeras 3 posiciones deben ser letras")
-        dig = "".join(c for c in v if c.isdigit())
-        if len(dig) != 3:
-            hints.append("debe contener exactamente 3 digitos")
+
+        if len(v) == 7 and v[3] == "-":
+            sufijo = v[4:7]
+        elif len(v) == 6:
+            sufijo = v[3:6]
+        else:
+            hints.append("use formato LLL000, LLL-000, LLL00L o LLL-00L")
+            return hints
+
+        if len(sufijo) != 3:
+            hints.append("la parte final debe tener 3 caracteres")
+            return hints
+
+        if not (sufijo[0].isdigit() and sufijo[1].isdigit()):
+            hints.append("los primeros 2 caracteres finales deben ser digitos")
+
+        if not (sufijo[2].isdigit() or sufijo[2].isalpha()):
+            hints.append("el ultimo caracter debe ser digito o letra")
+
         return hints
 
     if campo_key == "fecha":

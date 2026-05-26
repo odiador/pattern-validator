@@ -209,28 +209,35 @@ def validar_url(url: str) -> bool:
 
 
 def validar_placa(placa: str) -> bool:
-    """Valida placas en formato LLL-000 o LLL000."""
+    """Valida placas en formato LLL-000, LLL000, LLL-00L o LLL00L."""
     if not placa:
         return False
 
-    valor = placa.strip()
+    valor = placa.strip().upper()
+
     if len(valor) == 7 and valor[3] == "-":
         letras = valor[0:3]
-        numeros = valor[4:7]
+        sufijo = valor[4:7]
     elif len(valor) == 6:
         letras = valor[0:3]
-        numeros = valor[3:6]
+        sufijo = valor[3:6]
     else:
         return False
 
     for ch in letras:
         if not _es_letra_ascii(ch):
             return False
-    for ch in numeros:
-        if not _es_digito_ascii(ch):
-            return False
 
-    return True
+    # Dos primeros deben ser dígitos
+    if not (_es_digito_ascii(sufijo[0]) and _es_digito_ascii(sufijo[1])):
+        return False
+
+    # Último puede ser dígito (LLL000) o letra (LLL00L)
+    ultimo = sufijo[2]
+    if _es_digito_ascii(ultimo) or _es_letra_ascii(ultimo):
+        return True
+
+    return False
 
 
 def validar_password(password: str) -> bool:

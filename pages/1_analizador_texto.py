@@ -78,6 +78,6 @@ with st.expander("Criterios de validacion"):
 - Fechas: formatos DD/MM/AAAA o DD-MM-AAAA con validacion de calendario.
 - Telefonos: 7 a 15 digitos con separadores comunes.
 - URLs: http o https con dominio valido y TLD alfabetico.
-- Placas: formato LLL-000 o LLL000.
+- Placas: formato LLL-000, LLL000, LLL-00L o LLL00L.
 """
     )
