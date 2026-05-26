@@ -28,10 +28,13 @@ st.markdown(
   margin: 0 auto;
   padding: 56px 72px;
   background: #ffffff;
+  color: #000000;
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 10px;
   box-shadow: 0 18px 55px rgba(0,0,0,0.10);
 }
+
+.cover-page * { color: #000000 !important; }
 
 .cover-center { text-align: center; }
 .cover-title {
@@ -87,14 +90,23 @@ st.title("Validador de patrones con automatas finitos")
 
 st.markdown(
     """
-### Proyecto: Busqueda y validacion de patrones en textos y sistemas interactivos
+## 1. Descripción general
 
-Esta aplicacion usa Streamlit para exponer un motor de validacion manual basado en
-automatas finitos deterministas. El sistema evita por completo el uso de librerias
-de expresiones regulares y permite analizar multiples tipos de patrones en texto
-y en formularios interactivos.
+Aplicación web en **Streamlit** para **extraer** y **validar** patrones (correos, teléfonos, fechas, URLs, placas y contraseñas).
 
-Use el menu lateral para acceder a los modulos de analisis de textos y validacion
-de formularios.
+## 2. Funcionalidades
+
+- **Módulo A (Análisis de textos):** extrae patrones válidos desde texto o archivos `.txt`/`.log`.
+- **Módulo B (Formularios):** valida en tiempo real campos típicos de un formulario.
+- **Resumen y métricas:** tablas de resultados y conteos por estado/tipo.
+
+## 3. Motores disponibles
+
+- **FSM (sin regex):** validación manual con máquinas de estados finitos.
+- **Regex (re):** validación alternativa usando expresiones regulares.
+
+## 4. Uso
+
+Use el menú lateral para acceder a los módulos.
 """
 )

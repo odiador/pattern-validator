@@ -1,7 +1,8 @@
 import pandas as pd
 import streamlit as st
 
-from core.text_pipeline import analizar_texto
+from core.text_pipeline import analizar_texto as analizar_texto_fsm
+from core.regex_core import analizar_texto as analizar_texto_regex
 
 st.set_page_config(page_title="Analizador de textos", layout="wide")
 
@@ -9,10 +10,16 @@ st.title("Modulo A: Analisis de textos")
 
 st.markdown(
     """
-Este modulo permite procesar textos largos y extraer patrones validos mediante
-automatas finitos. El sistema no utiliza expresiones regulares y entrega resultados
-estructurados para su revision.
+Este modulo permite procesar textos largos y extraer patrones validos.
+
+Puede usar el motor FSM (sin regex) o un motor alternativo basado en expresiones regulares.
 """
+)
+
+motor = st.radio(
+    "Motor de extraccion",
+    ["FSM (sin regex)", "Regex (re)"],
+    horizontal=True,
 )
 
 col_entrada, col_archivo = st.columns([2, 1])
@@ -44,7 +51,10 @@ if st.button("Analizar patrones"):
     if not texto_final.strip():
         st.error("Debe ingresar texto o cargar un archivo.")
     else:
-        resultados = analizar_texto(texto_final)
+        if motor == "Regex (re)":
+            resultados = analizar_texto_regex(texto_final)
+        else:
+            resultados = analizar_texto_fsm(texto_final)
         st.subheader("Resultados del analisis")
 
         if resultados:

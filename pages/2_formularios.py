@@ -1,14 +1,8 @@
 import pandas as pd
 import streamlit as st
 
-from core.automata_core import (
-    validar_correo,
-    validar_fecha,
-    validar_password,
-    validar_placa,
-    validar_telefono,
-    validar_url,
-)
+from core import automata_core as fsm
+from core import regex_core as regex
 
 st.set_page_config(page_title="Validacion de formularios", layout="wide")
 
@@ -24,13 +18,38 @@ Nota: dependiendo del navegador, algunos campos confirman el cambio al salir del
 """
 )
 
+motor = st.radio(
+    "Motor de validacion",
+    ["FSM (sin regex)", "Regex (re)"],
+    horizontal=True,
+)
+
+validadores = {
+    "FSM (sin regex)": {
+        "correo": fsm.validar_correo,
+        "telefono": fsm.validar_telefono,
+        "fecha": fsm.validar_fecha,
+        "url": fsm.validar_url,
+        "placa": fsm.validar_placa,
+        "contrasena": fsm.validar_password,
+    },
+    "Regex (re)": {
+        "correo": regex.validar_correo,
+        "telefono": regex.validar_telefono,
+        "fecha": regex.validar_fecha,
+        "url": regex.validar_url,
+        "placa": regex.validar_placa,
+        "contrasena": regex.validar_password,
+    },
+}[motor]
+
 CAMPOS = [
-    ("correo", "Correo electronico", validar_correo, {"type": None}),
-    ("telefono", "Telefono", validar_telefono, {"type": None}),
-    ("fecha", "Fecha (DD/MM/AAAA o DD-MM-AAAA)", validar_fecha, {"type": None}),
-    ("url", "URL (http o https)", validar_url, {"type": None}),
-    ("placa", "Placa de vehiculo", validar_placa, {"type": None}),
-    ("contrasena", "Contrasena", validar_password, {"type": "password"}),
+    ("correo", "Correo electronico", validadores["correo"], {"type": None}),
+    ("telefono", "Telefono", validadores["telefono"], {"type": None}),
+    ("fecha", "Fecha (DD/MM/AAAA o DD-MM-AAAA)", validadores["fecha"], {"type": None}),
+    ("url", "URL (http o https)", validadores["url"], {"type": None}),
+    ("placa", "Placa de vehiculo", validadores["placa"], {"type": None}),
+    ("contrasena", "Contrasena", validadores["contrasena"], {"type": "password"}),
 ]
 
 REGLAS = {
