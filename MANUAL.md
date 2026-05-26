@@ -1,3 +1,23 @@
+<p align="center">
+  <img src="./UQ.png" alt="Universidad del Quindío" width="180" />
+</p>
+
+# Documentación Técnica: Sistema de Validación y Extracción de Patrones Basado en Máquinas de Estados Finitos (FSM)
+
+Juan Manuel Amador Roa
+
+Valeria Florez Paz
+
+Presentado a: Ana María Tamayo
+
+Universidad del Quindío  
+Facultad de Ingeniería  
+Programa Ingenieria de Sistemas y Computación  
+Teoría de lenguajes formales  
+Armenia- 2026
+
+---
+
 # Manual del Usuario y Documentación Técnica
 
 ## 1. Introducción
@@ -16,8 +36,8 @@ Este sistema permite la búsqueda y validación de patrones en textos y formular
 ### Módulo B: Validación de Formularios
 1. Acceda a la página **Formularios** desde el menú lateral.
 2. Complete los campos requeridos (Correo, Teléfono, Fecha, URL, Placa, Contraseña).
-3. Presione **Validar**.
-4. El sistema proporcionará retroalimentación inmediata sobre la validez sintáctica de cada campo y mantendrá un historial de intentos en la sesión actual.
+3. A medida que escribe, el sistema validará cada campo en tiempo real y mostrará si es **válido**, **inválido** o **pendiente**.
+4. Si desea registrar un intento, presione **Guardar intento en historial**. El sistema mantendrá un historial de intentos en la sesión actual.
 
 ## 3. Documentación Técnica
 
