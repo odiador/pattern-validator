@@ -191,9 +191,31 @@ def validar_telefono(telefono: str) -> bool:
             if char == "+":
                 estado = "qp1"
             elif char == "(":
-                estado = "q_p3_1"
+                estado = "q_paren_start"
             elif char == "3":
                 estado = "qd1"
+            else:
+                return False
+        elif estado == "q_paren_start":
+            if char == "+":
+                estado = "qp1_p"
+            elif char == "3":
+                estado = "qd1_p"
+            else:
+                return False
+        elif estado == "qp1_p":
+            if char == "5":
+                estado = "qp2_p"
+            else:
+                return False
+        elif estado == "qp2_p":
+            if char == "7":
+                estado = "qp3_p"
+            else:
+                return False
+        elif estado == "qp3_p":
+            if char == ")":
+                estado = "qp3"
             else:
                 return False
         elif estado == "qp1":

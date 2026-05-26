@@ -186,7 +186,7 @@ Para evidenciar el Módulo B:
 
     with tab_telefono:
         st.markdown("### Autómata de Teléfono (Colombia)")
-        st.caption("Valida números de teléfono en Colombia de forma estructurada: opcional prefijo +57, seguido opcionalmente de un código de área entre paréntesis (3XX) o sin ellos 3XX, separadores estructurados de grupos [espacio, punto o guion] y una división final opcional (DD-DD).")
+        st.caption("Valida números de teléfono en Colombia de forma estructurada: opcional prefijo +57 o (+57), seguido opcionalmente de un código de área entre paréntesis (3XX) o sin ellos 3XX, separadores estructurados de grupos [espacio, punto o guion] y una división final opcional (DD-DD).")
         dot_telefono = """digraph TelefonoColFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -197,7 +197,12 @@ Para evidenciar el Módulo B:
  qp3 [label="qp3 (7)"];
  qp3_sp [label="qp3_sp (Espacio)"];
  
- qp3_1 [label="qp3_1 (Open)"];
+ qp_start [label="qp_start ((()"];
+ qp1_p [label="qp1_p (+)"];
+ qp2_p [label="qp2_p (5)"];
+ qp3_p [label="qp3_p (7)"];
+ 
+ qp3_1 [label="qp3_1 ((()"];
  qd1_p [label="qd1_p (3)"];
  qd2_p [label="qd2_p (D)"];
  qd3_p [label="qd3_p (D)"];
@@ -223,15 +228,20 @@ Para evidenciar el Módulo B:
  qp1 -> qp2 [label="5"];
  qp2 -> qp3 [label="7"];
  
+ q0 -> qp_start [label="("];
+ qp_start -> qp1_p [label="+"];
+ qp1_p -> qp2_p [label="5"];
+ qp2_p -> qp3_p [label="7"];
+ qp3_p -> qp3 [label=")"];
+ 
+ qp_start -> qd1_p [label="3"];
+ 
  qp3 -> qp3_sp [label="espacio"];
  qp3 -> qp3_1 [label="("];
  qp3 -> qd1 [label="3"];
  
  qp3_sp -> qp3_1 [label="("];
  qp3_sp -> qd1 [label="3"];
- 
- q0 -> qp3_1 [label="("];
- q0 -> qd1 [label="3"];
  
  qp3_1 -> qd1_p [label="3"];
  qd1_p -> qd2_p [label="D"];

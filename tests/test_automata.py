@@ -61,6 +61,10 @@ def test_validar_fecha(fecha, esperado):
     ("((300) 123-4567", False),
     ("(300)) 123-4567", False),
     ("300--123-4567", False),
+    ("(+57) 313 333 3333", True),
+    ("(+57) (300) 123-4567", True),
+    ("(+57 300 123 4567", False),
+    ("+57) 300 123 4567", False),
 ])
 def test_validar_telefono(telefono, esperado):
     assert validar_telefono(telefono) == esperado
