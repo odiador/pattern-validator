@@ -4,6 +4,7 @@ from pathlib import Path
 import streamlit as st
 
 REPO_URL = "https://github.com/odiador/pattern-validator/tree/main/"
+BLOB_URL = "https://github.com/odiador/pattern-validator/blob/main/"
 LOCAL_URL = "http://localhost:8501"  # Streamlit por defecto
 
 
@@ -45,23 +46,23 @@ Implementar una aplicación web que permita **extraer** y **validar** patrones f
 ### Descripción
 
 - **Tecnología:** Streamlit (UI), Python (lógica), pandas (tablas/resúmenes).
-- **Arquitectura:**
-  - `app.py`: enrutador con `st.navigation`.
-  - `vista_principal.py`: documentación y guía de la solución.
-  - `pages/1_analizador_texto.py`: Módulo A (extracción en texto).
-  - `pages/2_formularios.py`: Módulo B (validación en formularios).
-  - `core/automata_core.py`: validadores FSM (sin regex).
-  - `core/text_pipeline.py`: pipeline de tokenización + validación para extracción.
-  - `core/regex_core.py`: motor alternativo opcional basado en regex.
+- **Arquitectura (archivos en GitHub):**
+  - [`app.py`]({BLOB_URL}app.py): enrutador con `st.navigation`.
+  - [`vista_principal.py`]({BLOB_URL}vista_principal.py): documentación y guía de la solución.
+  - [`pages/1_analizador_texto.py`]({BLOB_URL}pages/1_analizador_texto.py): Módulo A (extracción en texto).
+  - [`pages/2_formularios.py`]({BLOB_URL}pages/2_formularios.py): Módulo B (validación en formularios).
+  - [`core/automata_core.py`]({BLOB_URL}core/automata_core.py): validadores FSM (sin regex).
+  - [`core/text_pipeline.py`]({BLOB_URL}core/text_pipeline.py): pipeline de tokenización + validación para extracción.
+  - [`core/regex_core.py`]({BLOB_URL}core/regex_core.py): motor alternativo opcional basado en regex.
 
 ### Desarrollo
 
-#### Vista 1: Vista principal (`vista_principal.py`)
+#### Vista 1: Vista principal ([`vista_principal.py`]({BLOB_URL}vista_principal.py))
 
 - Muestra la **portada** y esta **especificación**.
 - Incluye enlaces y comandos para ejecutar, probar y ubicar el código.
 
-#### Vista 2: Módulo A — Análisis de textos (`pages/1_analizador_texto.py`)
+#### Vista 2: Módulo A — Análisis de textos ([`pages/1_analizador_texto.py`]({BLOB_URL}pages/1_analizador_texto.py))
 
 **Flujo de usuario**
 1. El usuario pega texto en `st.text_area` o carga `.txt/.log`.
@@ -69,7 +70,7 @@ Implementar una aplicación web que permita **extraer** y **validar** patrones f
 3. Presiona **Analizar patrones**.
 
 **Qué pasa por dentro (FSM)**
-- `core/text_pipeline.py`:
+- [`core/text_pipeline.py`]({BLOB_URL}core/text_pipeline.py):
   - Tokeniza candidatos con `_tokenizar_candidatos` (solo caracteres permitidos).
   - Limpia tokens con `_limpiar_token`.
   - Prueba validadores en orden (más específicos → más generales) para evitar ambigüedades.
@@ -77,7 +78,7 @@ Implementar una aplicación web que permita **extraer** y **validar** patrones f
 **Salida**
 - Tabla con pares `{{tipo, valor}}` y un resumen por tipo.
 
-#### Vista 3: Módulo B — Validación de formularios (`pages/2_formularios.py`)
+#### Vista 3: Módulo B — Validación de formularios ([`pages/2_formularios.py`]({BLOB_URL}pages/2_formularios.py))
 
 **Objetivo:** validación reactiva con feedback por campo.
 
@@ -106,16 +107,16 @@ Implementar una aplicación web que permita **extraer** y **validar** patrones f
     )
 
     st.markdown(
-        """
+       f"""
 ## Código fuente organizado
 
 Estructura principal:
 
-- `app.py` (router)
-- `vista_principal.py` (documentación)
-- `pages/` (vistas)
-- `core/` (lógica de validación y extracción)
-- `tests/` (pruebas unitarias)
+- [`app.py`]({BLOB_URL}app.py) (router)
+- [`vista_principal.py`]({BLOB_URL}vista_principal.py) (documentación)
+- [`pages/`]({REPO_URL}pages) (vistas)
+- [`core/`]({REPO_URL}core) (lógica de validación y extracción)
+- [`tests/`]({REPO_URL}tests) (pruebas unitarias)
 
 """
     )
@@ -142,8 +143,8 @@ Para evidenciar el Módulo B:
 
     st.markdown("## Tabla de casos de prueba (éxitos y fallos)")
     st.markdown(
-        """
-- Pruebas unitarias: `tests/test_automata.py`.
+       f"""
+- Pruebas unitarias: [`tests/test_automata.py`]({BLOB_URL}tests/test_automata.py).
 - Comando:
 """
     )
