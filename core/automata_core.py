@@ -66,23 +66,103 @@ def validar_correo(correo: str) -> bool:
 
 
 def validar_fecha(fecha: str) -> bool:
-    """Valida fechas en formato DD/MM/AAAA o DD-MM-AAAA."""
-    if not fecha or len(fecha) != 10:
+    """Valida fechas en formato DD/MM/AAAA o DD-MM-AAAA usando una FSM pura caracter por caracter, admitiendo parentesis."""
+    if not fecha:
         return False
 
-    sep = fecha[2]
-    if sep not in ["/", "-"]:
-        return False
-    if fecha[5] != sep:
+    # Validar que los paréntesis estén balanceados
+    abiertos = 0
+    for c in fecha:
+        if c == "(":
+            abiertos += 1
+        elif c == ")":
+            abiertos -= 1
+            if abiertos < 0:
+                return False
+    if abiertos != 0:
         return False
 
-    for idx in [0, 1, 3, 4, 6, 7, 8, 9]:
-        if not _es_digito_ascii(fecha[idx]):
+    fecha_limpia = "".join(c for c in fecha if c not in ["(", ")"])
+    if len(fecha_limpia) != 10:
+        return False
+
+    estado = "q0"
+    sep_encontrado = None
+    
+    d1, d2 = "", ""
+    m1, m2 = "", ""
+    y1, y2, y3, y4 = "", "", "", ""
+
+    for char in fecha_limpia:
+        if estado == "q0":
+            if _es_digito_ascii(char):
+                d1 = char
+                estado = "q_d1"
+            else:
+                return False
+        elif estado == "q_d1":
+            if _es_digito_ascii(char):
+                d2 = char
+                estado = "q_d2"
+            else:
+                return False
+        elif estado == "q_d2":
+            if char in ["/", "-"]:
+                sep_encontrado = char
+                estado = "q_s1"
+            else:
+                return False
+        elif estado == "q_s1":
+            if _es_digito_ascii(char):
+                m1 = char
+                estado = "q_m1"
+            else:
+                return False
+        elif estado == "q_m1":
+            if _es_digito_ascii(char):
+                m2 = char
+                estado = "q_m2"
+            else:
+                return False
+        elif estado == "q_m2":
+            if char == sep_encontrado:
+                estado = "q_s2"
+            else:
+                return False
+        elif estado == "q_s2":
+            if _es_digito_ascii(char):
+                y1 = char
+                estado = "q_y1"
+            else:
+                return False
+        elif estado == "q_y1":
+            if _es_digito_ascii(char):
+                y2 = char
+                estado = "q_y2"
+            else:
+                return False
+        elif estado == "q_y2":
+            if _es_digito_ascii(char):
+                y3 = char
+                estado = "q_y3"
+            else:
+                return False
+        elif estado == "q_y3":
+            if _es_digito_ascii(char):
+                y4 = char
+                estado = "q_y4"
+            else:
+                return False
+        else:
             return False
 
-    dia = int(fecha[0:2])
-    mes = int(fecha[3:5])
-    anio = int(fecha[6:10])
+    if estado != "q_y4":
+        return False
+
+    # Ahora validamos los valores reales de fecha con calendario
+    dia = int(d1 + d2)
+    mes = int(m1 + m2)
+    anio = int(y1 + y2 + y3 + y4)
 
     if mes < 1 or mes > 12:
         return False
@@ -100,54 +180,61 @@ def validar_fecha(fecha: str) -> bool:
 
 
 def validar_telefono(telefono: str) -> bool:
-    """Valida telefonos con digitos y separadores comunes."""
+    """Valida teléfonos en Colombia usando un DFA paso a paso: opcional +57, inicia con 3 y tiene exactamente 10 dígitos."""
     if not telefono:
         return False
 
-    estado = "start"
-    total_digitos = 0
-    separadores = [" ", "-", ".", "(", ")"]
+    estado = "q0"
+    digitos = 0
 
     for char in telefono:
-        if estado == "start":
-            if char == "+":
-                estado = "plus"
-            elif char == "(":
-                estado = "sep"
-            elif _es_digito_ascii(char):
-                total_digitos += 1
-                estado = "digits"
-            else:
-                return False
-        elif estado == "plus":
-            if _es_digito_ascii(char):
-                total_digitos += 1
-                estado = "digits"
-            elif char == "(":
-                estado = "sep"
-            else:
-                return False
-        elif estado == "digits":
-            if _es_digito_ascii(char):
-                total_digitos += 1
-            elif char in separadores:
-                estado = "sep"
-            else:
-                return False
-        elif estado == "sep":
-            if _es_digito_ascii(char):
-                total_digitos += 1
-                estado = "digits"
-            elif char in separadores:
-                continue
-            else:
-                return False
+        # Los separadores no alteran el conteo de dígitos y se permiten en cualquier posición
+        if char in [" ", "-", ".", "(", ")"]:
+            if estado in ["qp1", "qp2"]:
+                return False  # No permitimos separadores dentro del prefijo "+57"
+            continue
 
-    return (estado == "digits" or estado == "sep") and 7 <= total_digitos <= 15
+        if estado == "q0":
+            if char == "+":
+                estado = "qp1"
+            elif char == "3":
+                estado = "qd1"
+                digitos = 1
+            else:
+                return False
+        elif estado == "qp1":
+            if char == "5":
+                estado = "qp2"
+            else:
+                return False
+        elif estado == "qp2":
+            if char == "7":
+                estado = "qp3"
+            else:
+                return False
+        elif estado == "qp3":
+            if char == "3":
+                estado = "qd1"
+                digitos = 1
+            else:
+                return False
+        elif estado.startswith("qd"):
+            if _es_digito_ascii(char):
+                digitos += 1
+                if digitos <= 10:
+                    estado = f"qd{digitos}"
+                else:
+                    return False  # Excede los 10 dígitos obligatorios
+            else:
+                return False
+        else:
+            return False
+
+    return estado == "qd10" and digitos == 10
 
 
 def validar_url(url: str) -> bool:
-    """Valida URLs basadas en http o https."""
+    """Valida URLs basadas en http o https, soportando localhost, dominios estándar o IPs (octetos <= 255)."""
     if not url:
         return False
 
@@ -178,6 +265,19 @@ def validar_url(url: str) -> bool:
         return False
 
     if host == "localhost":
+        return True
+
+    # Comprobar si es dirección IP (4 octetos numéricos entre 0 y 255)
+    partes_ip = host.split(".")
+    es_ip = len(partes_ip) == 4 and all(p.isdigit() for p in partes_ip)
+    if es_ip:
+        for part in partes_ip:
+            val = int(part)
+            if val < 0 or val > 255:
+                return False
+            # Evitar ceros a la izquierda innecesarios (ej: 01)
+            if len(part) > 1 and part[0] == "0":
+                return False
         return True
 
     if "." not in host:

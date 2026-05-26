@@ -9,7 +9,7 @@ from core.automata_core import (
 )
 
 
-def _tokenizar_candidatos(texto: str) -> List[str]:
+def _tokenizar_candidatos_con_pos(texto: str) -> List[tuple]:
     if not texto:
         return []
 
@@ -20,18 +20,21 @@ def _tokenizar_candidatos(texto: str) -> List[str]:
         "@._-+/:?&=#()[]"
     )
 
-    tokens: List[str] = []
+    tokens: List[tuple] = []
     actual: List[str] = []
+    inicio_token = -1
 
-    for ch in texto:
+    for idx, ch in enumerate(texto):
         if ch in permitidos:
+            if not actual:
+                inicio_token = idx
             actual.append(ch)
         else:
             if actual:
-                tokens.append("".join(actual))
+                tokens.append((inicio_token, "".join(actual)))
                 actual = []
     if actual:
-        tokens.append("".join(actual))
+        tokens.append((inicio_token, "".join(actual)))
 
     return tokens
 
@@ -42,9 +45,34 @@ def _limpiar_token(token: str) -> str:
     return token.strip(".,;:!?()[]{}<>\"'")
 
 
+def _buscar_candidatos_telefono_con_pos(texto: str) -> List[tuple]:
+    """Escanea el texto en búsqueda de secuencias contiguas que correspondan a un patrón telefónico (admitiendo espacios)."""
+    candidatos = []
+    n = len(texto)
+    i = 0
+    while i < n:
+        if texto[i] in "+3(0123456789":
+            inicio = i
+            while i < n and (texto[i].isdigit() or texto[i] in " +-()."):
+                i += 1
+            candidato = texto[inicio:i].strip()
+            # Limpiar posibles delimitadores colgantes al final
+            while candidato and candidato[-1] in " +-.((":
+                candidato = candidato[:-1]
+            if candidato:
+                digitos = sum(1 for c in candidato if c.isdigit())
+                if digitos >= 7:
+                    candidatos.append((inicio, candidato))
+        else:
+            i += 1
+    return candidatos
+
+
 def analizar_texto(texto: str) -> List[Dict[str, str]]:
-    """Extrae patrones validos desde un bloque de texto."""
-    candidatos = _tokenizar_candidatos(texto)
+    """Extrae patrones validos desde un bloque de texto en orden cronológico de aparición."""
+    candidatos_con_pos = _tokenizar_candidatos_con_pos(texto) + _buscar_candidatos_telefono_con_pos(texto)
+    candidatos_con_pos.sort(key=lambda x: x[0])
+
     resultados: List[Dict[str, str]] = []
     vistos = set()
 
@@ -58,7 +86,7 @@ def analizar_texto(texto: str) -> List[Dict[str, str]]:
         ("telefono", validar_telefono),
     ]
 
-    for candidato in candidatos:
+    for _, candidato in candidatos_con_pos:
         valor = _limpiar_token(candidato)
         if not valor:
             continue

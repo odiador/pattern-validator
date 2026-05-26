@@ -58,8 +58,9 @@ REGLAS = {
         "TLD (extension): 2 a 24 letras",
     ],
     "telefono": [
-        "Debe contener entre 7 y 15 digitos (los separadores se permiten)",
-        "Se permiten: +, (), espacios, guiones y puntos",
+        "Prefijo opcional: +57 (para Colombia)",
+        "Debe iniciar con el dígito 3",
+        "Debe contener exactamente 10 dígitos principales (se permiten separadores comunes)",
         "No se permiten letras",
     ],
     "fecha": [
@@ -125,11 +126,21 @@ def _hints(campo_key: str, valor: str) -> list[str]:
         return _faltantes_password(valor)
 
     if campo_key == "telefono":
-        digitos = sum(1 for c in valor if c.isdigit())
-        if digitos < 7 or digitos > 15:
-            hints.append(f"cantidad de digitos entre 7 y 15 (actual: {digitos})")
+        import re
+        digitos = "".join(re.findall(r"\d", valor))
         if any(c.isalpha() for c in valor):
             hints.append("no usar letras")
+        
+        if digitos.startswith("57"):
+            if len(digitos) != 12:
+                hints.append(f"debe tener exactamente 10 dígitos después de +57 (leídos: {len(digitos)-2})")
+            if len(digitos) >= 3 and digitos[2] != "3":
+                hints.append("el número debe iniciar con 3")
+        else:
+            if len(digitos) != 10:
+                hints.append(f"debe tener exactamente 10 dígitos (actual: {len(digitos)})")
+            if len(digitos) >= 1 and digitos[0] != "3":
+                hints.append("el número debe iniciar con 3")
         return hints
 
     if campo_key == "correo":

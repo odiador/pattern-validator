@@ -51,15 +51,32 @@ def validar_telefono(telefono: str) -> bool:
     if re.fullmatch(r"[0-9+().\-\s]+", valor) is None:
         return False
 
-    digitos = re.findall(r"\d", valor)
-    return 7 <= len(digitos) <= 15
+    digitos = "".join(re.findall(r"\d", valor))
+    if len(digitos) == 10:
+        return digitos.startswith("3")
+    elif len(digitos) == 12:
+        return digitos.startswith("573")
+    return False
 
 
 def validar_fecha(fecha: str) -> bool:
     if not fecha:
         return False
 
-    m = _FECHA_RE.fullmatch(fecha.strip())
+    # Validar que los paréntesis estén balanceados
+    abiertos = 0
+    for c in fecha:
+        if c == "(":
+            abiertos += 1
+        elif c == ")":
+            abiertos -= 1
+            if abiertos < 0:
+                return False
+    if abiertos != 0:
+        return False
+
+    fecha_limpia = "".join(c for c in fecha if c not in ["(", ")"])
+    m = _FECHA_RE.fullmatch(fecha_limpia.strip())
     if not m:
         return False
 
@@ -83,20 +100,32 @@ def validar_url(url: str) -> bool:
     if " " in valor:
         return False
 
-    # Soporta localhost o dominio con TLD 2-24 y puerto opcional.
+    # Soporta localhost, IP de 4 octetos o dominio con TLD 2-24 y puerto opcional.
     patron = (
         r"^https?://"
-        r"(localhost|(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,24})"
+        r"(localhost|(?:\d{1,3}\.){3}\d{1,3}|(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,24})"
         r"(?::\d{1,5})?"
         r"(?:/[^\s]*)?$"
     )
     if re.fullmatch(patron, valor) is None:
         return False
 
-    # Validacion de rango de puerto si existe.
+    # Validacion de rango de puerto e IP si existe.
     hostport = valor.split("//", 1)[1].split("/", 1)[0]
+    host = hostport.split(":", 1)[0]
+
+    # Validar octetos de IP <= 255
+    partes_ip = host.split(".")
+    if len(partes_ip) == 4 and all(p.isdigit() for p in partes_ip):
+        for part in partes_ip:
+            if int(part) > 255:
+                return False
+            if len(part) > 1 and part[0] == "0":
+                return False
+        return True
+
     if ":" in hostport and not hostport.startswith("localhost"):
-        host, port_s = hostport.rsplit(":", 1)
+        port_s = hostport.rsplit(":", 1)[1]
         if port_s.isdigit():
             port = int(port_s)
             if not (1 <= port <= 65535):
@@ -106,14 +135,15 @@ def validar_url(url: str) -> bool:
 
 
 def analizar_texto(texto: str) -> List[Dict[str, str]]:
-    """Extrae patrones validos desde un bloque de texto usando regex + validadores."""
+    """Extrae patrones validos desde un bloque de texto usando regex + validadores en orden cronológico de aparición."""
     if not texto:
         return []
 
-    resultados: List[Dict[str, str]] = []
-    vistos = set()
+    # Recolectar todos los candidatos con su posición de inicio
+    candidatos_con_pos = []
 
-    # Orden: especifico -> general (telefono al final).
+    # Orden de precedencia para validación en caso de que coincidan exactamente en la misma posición,
+    # aunque se ordenan cronológicamente por su índice de inicio.
     buscadores = [
         ("fecha", re.compile(r"\b\d{2}[/-]\d{2}[/-]\d{4}\b"), validar_fecha),
         ("url", re.compile(r"https?://[^\s<>\"']+"), validar_url),
@@ -128,13 +158,24 @@ def analizar_texto(texto: str) -> List[Dict[str, str]]:
 
     for tipo, patron, validador in buscadores:
         for m in patron.finditer(texto):
-            valor = m.group(0).strip(".,;:!?()[]{}<>\"'")
-            if not valor:
-                continue
-            if validador(valor):
-                clave = (tipo, valor)
-                if clave not in vistos:
-                    resultados.append({"tipo": tipo, "valor": valor})
-                    vistos.add(clave)
+            inicio = m.start()
+            valor_raw = m.group(0)
+            candidatos_con_pos.append((inicio, tipo, valor_raw, validador))
+
+    # Ordenar por posición de inicio en el texto original
+    candidatos_con_pos.sort(key=lambda x: x[0])
+
+    resultados: List[Dict[str, str]] = []
+    vistos = set()
+
+    for _, tipo, valor_raw, validador in candidatos_con_pos:
+        valor = valor_raw.strip(".,;:!?()[]{}<>\"'")
+        if not valor:
+            continue
+        if validador(valor):
+            clave = (tipo, valor)
+            if clave not in vistos:
+                resultados.append({"tipo": tipo, "valor": valor})
+                vistos.add(clave)
 
     return resultados

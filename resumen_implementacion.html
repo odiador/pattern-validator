@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Implementación - Validador de Patrones</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --accent: #3b82f6;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --success: #22c55e;
+            --code-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--secondary);
+        }
+
+        .section {
+            margin-bottom: 60px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        h2 {
+            color: var(--primary);
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 4px solid var(--accent);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--text);
+        }
+
+        .fsm-details {
+            margin-top: 20px;
+        }
+
+        .fsm-box {
+            background: var(--code-bg);
+            color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .timeline-item {
+            padding: 20px 30px;
+            position: relative;
+            background: rgba(37, 99, 235, 0.05);
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .diagram-container {
+            background: #ffffff;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Validador de Patrones con Autómatas</h1>
+        <p class="subtitle">Especificación Técnica de Autómatas Implementados</p>
+    </header>
+
+    <section class="section">
+        <h2>1. Especificación de Autómatas (DFA)</h2>
+        <p>A continuación se detallan los estados y transiciones de los principales autómatas implementados manualmente.</p>
+
+        <div class="fsm-details">
+            <h3 class="highlight">Autómata de Correo Electrónico</h3>
+            <div class="fsm-box">
+Estados:
+- q0: Inicio (Espera letra/número)
+- q1: Usuario (Acepta alnum, '.', '_', '-')
+- q2: Separador '@' encontrado
+- q3: Dominio (Acepta alnum, '-')
+- q4: Punto '.' encontrado (Espera TLD)
+- q5: TLD (Estado de Aceptación, min 2 letras)
+
+Transiciones Clave:
+q0 --[alnum]--> q1
+q1 --[@]--> q2
+q2 --[alnum]--> q3
+q3 --[.]--> q4
+q4 --[letra]--> q5
+q5 --[letra]--> q5
+q5 --[.]--> q4 (Soporte subdominios)
+            </div>
+            <h4>Diagrama de Transición (DFA Correo)</h4>
+            <div class="diagram-container">
+                <svg viewBox="0 0 650 180" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+                    </marker>
+                  </defs>
+                  
+                  <!-- Transiciones -->
+                  <!-- q0 -> q1 -->
+                  <path d="M 50 100 L 150 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="100" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">alnum</text>
+                  
+                  <!-- q1 -> q1 self loop -->
+                  <path d="M 140 80 A 15 15 0 1 1 160 80" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="150" y="45" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">alnum|.|_|-</text>
+                  
+                  <!-- q1 -> q2 -->
+                  <path d="M 150 100 L 250 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="200" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">@</text>
+                  
+                  <!-- q2 -> q3 -->
+                  <path d="M 250 100 L 350 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="300" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">alnum</text>
+                  
+                  <!-- q3 -> q3 self loop -->
+                  <path d="M 340 80 A 15 15 0 1 1 360 80" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="350" y="45" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">alnum|-</text>
+                  
+                  <!-- q3 -> q4 -->
+                  <path d="M 350 100 L 450 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="400" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">.</text>
+                  
+                  <!-- q4 -> q5 -->
+                  <path d="M 450 100 L 550 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="500" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">letra</text>
+                  
+                  <!-- q5 -> q5 self loop -->
+                  <path d="M 540 80 A 15 15 0 1 1 560 80" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="550" y="45" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">letra</text>
+
+                  <!-- q5 -> q4 (subdominio loop back) -->
+                  <path d="M 550 120 Q 500 150 450 120" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="500" y="155" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">.</text>
+                  
+                  <!-- Indicador de Inicio -->
+                  <path d="M 15 100 L 30 100" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+                  
+                  <!-- Nodos / Estados -->
+                  <!-- q0 -->
+                  <circle cx="50" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="50" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q0</text>
+                  
+                  <!-- q1 -->
+                  <circle cx="150" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="150" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q1</text>
+                  
+                  <!-- q2 -->
+                  <circle cx="250" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="250" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q2</text>
+                  
+                  <!-- q3 -->
+                  <circle cx="350" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="350" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q3</text>
+                  
+                  <!-- q4 -->
+                  <circle cx="450" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="450" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q4</text>
+                  
+                  <!-- q5 (Aceptación) -->
+                  <circle cx="550" cy="100" r="20" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
+                  <circle cx="550" cy="100" r="16" fill="none" stroke="#22c55e" stroke-width="1.5" />
+                  <text x="550" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#15803d" text-anchor="middle">q5</text>
+                </svg>
+            </div>
+
+            <h3 class="highlight">Autómata de Teléfono (Colombia)</h3>
+            <div class="fsm-box">
+Estados:
+- q0: Inicio (Espera + o dígito 3)
+- qp1: Prefijo '+' leído
+- qp2: Prefijo '+5' leído
+- qp3: Prefijo '+57' leído
+- qd1-qd10: Estados secuenciales para cada dígito del número principal de 10 dígitos (inicia obligatoriamente en qd1 con el dígito 3).
+- qd10: Estado de Aceptación (requiere exactamente 10 dígitos principales).
+            </div>
+            <h4>Diagrama de Transición (DFA Teléfono)</h4>
+            <div class="diagram-container">
+                <svg viewBox="0 0 950 120" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+                    </marker>
+                    <marker id="arrow-short" viewBox="0 0 10 10" refX="18" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+                    </marker>
+                  </defs>
+                  
+                  <!-- Transiciones del prefijo -->
+                  <path d="M 40 70 L 110 30" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="75" y="45" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">+</text>
+                  
+                  <path d="M 110 30 L 180 30" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="145" y="20" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">5</text>
+                  
+                  <path d="M 180 30 L 250 30" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="215" y="20" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">7</text>
+                  
+                  <path d="M 250 30 L 320 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="285" y="45" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">3</text>
+                  
+                  <!-- Transición directa desde inicio -->
+                  <path d="M 40 70 L 320 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="180" y="65" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">3</text>
+                  
+                  <!-- Transiciones secuenciales de dígitos -->
+                  <path d="M 320 70 L 380 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="350" y="60" font-family="sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">D</text>
+                  <path d="M 380 70 L 440 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="410" y="60" font-family="sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">D</text>
+                  <path d="M 440 70 L 500 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="470" y="60" font-family="sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">D</text>
+                  <path d="M 500 70 L 560 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="530" y="60" font-family="sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">D</text>
+                  <path d="M 560 70 L 620 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="590" y="60" font-family="sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">D</text>
+                  <path d="M 620 70 L 680 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="650" y="60" font-family="sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">D</text>
+                  <path d="M 680 70 L 740 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="710" y="60" font-family="sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">D</text>
+                  <path d="M 740 70 L 800 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="770" y="60" font-family="sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">D</text>
+                  <path d="M 800 70 L 880 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="840" y="60" font-family="sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">D</text>
+
+                  <!-- Indicador de inicio -->
+                  <path d="M 10 70 L 20 70" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-short)" />
+
+                  <!-- Nodos -->
+                  <circle cx="40" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="40" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q0</text>
+                  <circle cx="110" cy="30" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="110" y="34" font-family="sans-serif" font-size="10" text-anchor="middle">qp1</text>
+                  <circle cx="180" cy="30" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="180" y="34" font-family="sans-serif" font-size="10" text-anchor="middle">qp2</text>
+                  <circle cx="250" cy="30" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="250" y="34" font-family="sans-serif" font-size="10" text-anchor="middle">qp3</text>
+                  
+                  <circle cx="320" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="320" y="74" font-family="sans-serif" font-size="9" text-anchor="middle">qd1</text>
+                  <circle cx="380" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="380" y="74" font-family="sans-serif" font-size="9" text-anchor="middle">qd2</text>
+                  <circle cx="440" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="440" y="74" font-family="sans-serif" font-size="9" text-anchor="middle">qd3</text>
+                  <circle cx="500" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="500" y="74" font-family="sans-serif" font-size="9" text-anchor="middle">qd4</text>
+                  <circle cx="560" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="560" y="74" font-family="sans-serif" font-size="9" text-anchor="middle">qd5</text>
+                  <circle cx="620" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="620" y="74" font-family="sans-serif" font-size="9" text-anchor="middle">qd6</text>
+                  <circle cx="680" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="680" y="74" font-family="sans-serif" font-size="9" text-anchor="middle">qd7</text>
+                  <circle cx="740" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="740" y="74" font-family="sans-serif" font-size="9" text-anchor="middle">qd8</text>
+                  <circle cx="800" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="800" y="74" font-family="sans-serif" font-size="9" text-anchor="middle">qd9</text>
+                  
+                  <circle cx="880" cy="70" r="16" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
+                  <circle cx="880" cy="70" r="12" fill="none" stroke="#22c55e" stroke-width="1.5" />
+                  <text x="880" y="74" font-family="sans-serif" font-size="9" fill="#15803d" text-anchor="middle">qd10</text>
+                </svg>
+            </div>
+
+            <h3 class="highlight">Autómata de URLs</h3>
+            <div class="fsm-box">
+Lógica Secuencial:
+1. Identificación de protocolo (http:// o https://)
+2. Extracción de host y puerto (soportando localhost o dirección IP con rango de octeto &lt;= 255)
+3. Validación de etiquetas de dominio (no inician/terminan con '-')
+4. Verificación de TLD (longitud 2-24, solo letras)
+5. Soporte para 'localhost' e IPs como casos especiales
+            </div>
+            <h4>Diagrama de Transición (DFA URL)</h4>
+            <div class="diagram-container">
+                <svg viewBox="0 0 650 220" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+                    </marker>
+                  </defs>
+                  
+                  <!-- Transiciones -->
+                  <!-- q0 -> q1 -->
+                  <path d="M 50 100 L 150 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="100" y="90" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">http(s)://</text>
+                  
+                  <!-- q1 -> q2 (localhost) -->
+                  <path d="M 150 100 L 250 50" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="200" y="70" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">localhost|octeto_IP</text>
+                  
+                  <!-- q1 -> q3 -->
+                  <path d="M 150 100 L 250 150" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="200" y="140" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">alnum</text>
+                  
+                  <!-- q3 -> q3 self loop -->
+                  <path d="M 240 170 A 15 15 0 1 1 260 170" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="250" y="205" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">alnum|-</text>
+
+                  <!-- q3 -> q4 -->
+                  <path d="M 250 150 L 350 150" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="300" y="140" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">.</text>
+                  
+                  <!-- q4 -> q5 -->
+                  <path d="M 350 150 L 450 150" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="400" y="140" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">letra|octeto_IP</text>
+
+                  <!-- q5 -> q5 self loop -->
+                  <path d="M 440 170 A 15 15 0 1 1 460 170" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="450" y="205" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">letra</text>
+
+                  <!-- q5 -> q4 (Tld dot transition) -->
+                  <path d="M 450 130 Q 400 110 350 130" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="400" y="115" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">.</text>
+
+                  <!-- Indicador de Inicio -->
+                  <path d="M 15 100 L 30 100" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+
+                  <!-- Nodos / Estados -->
+                  <circle cx="50" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="50" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q0</text>
+                  <circle cx="150" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="150" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q1</text>
+                  
+                  <circle cx="250" cy="50" r="20" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
+                  <circle cx="250" cy="50" r="16" fill="none" stroke="#22c55e" stroke-width="1.5" />
+                  <text x="250" y="55" font-family="sans-serif" font-size="12" font-weight="bold" fill="#15803d" text-anchor="middle">q2</text>
+                  
+                  <circle cx="250" cy="150" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="250" y="155" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q3</text>
+                  <circle cx="350" cy="150" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="350" y="155" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q4</text>
+                  
+                  <circle cx="450" cy="150" r="20" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
+                  <circle cx="450" cy="150" r="16" fill="none" stroke="#22c55e" stroke-width="1.5" />
+                  <text x="450" y="155" font-family="sans-serif" font-size="12" font-weight="bold" fill="#15803d" text-anchor="middle">q5</text>
+                </svg>
+            </div>
+
+            <h3 class="highlight">Autómata de Fechas</h3>
+            <div class="fsm-box">
+Estados y Transición Secuencial (FSM pura):
+- q0: Estado inicial.
+- q_d1, q_d2: Estados para leer los dos dígitos del día (DD).
+- q_s1: Estado tras leer el separador '/' o '-'.
+- q_m1, q_m2: Estados para leer los dos dígitos del mes (MM).
+- q_s2: Estado tras leer el segundo separador (debe coincidir con el primero).
+- q_y1 a q_y4: Estados secuenciales para los cuatro dígitos del año (AAAA).
+- q_y4: Estado de Aceptación final.
+* Nota: Se permite el uso de paréntesis '(' y ')' en cualquier posición siempre que estén correctamente balanceados.
+            </div>
+            <h4>Diagrama de Transición (DFA Fecha)</h4>
+            <div class="diagram-container">
+                <svg viewBox="0 0 1000 120" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+                    </marker>
+                  </defs>
+                  
+                  <!-- Transiciones -->
+                  <path d="M 50 60 L 130 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="90" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 130 60 L 210 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="170" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 210 60 L 290 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="250" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">/ | -</text>
+                  <path d="M 290 60 L 370 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="330" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 370 60 L 450 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="410" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 450 60 L 530 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="490" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">/ | -</text>
+                  <path d="M 530 60 L 610 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="570" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 610 60 L 690 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="650" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 690 60 L 770 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="730" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 770 60 L 850 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="810" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+
+                  <!-- Indicador de Inicio -->
+                  <path d="M 15 60 L 30 60" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+
+                  <!-- Nodos / Estados -->
+                  <circle cx="50" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="50" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q0</text>
+                  <circle cx="130" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="130" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q1</text>
+                  <circle cx="210" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="210" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q2</text>
+                  <circle cx="290" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="290" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q3</text>
+                  <circle cx="370" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="370" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q4</text>
+                  <circle cx="450" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="450" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q5</text>
+                  <circle cx="530" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="530" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q6</text>
+                  <circle cx="610" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="610" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q7</text>
+                  <circle cx="690" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="690" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q8</text>
+                  <circle cx="770" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="770" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q9</text>
+                  
+                  <circle cx="850" cy="60" r="16" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
+                  <circle cx="850" cy="60" r="12" fill="none" stroke="#22c55e" stroke-width="1.5" />
+                  <text x="850" y="64" font-family="sans-serif" font-size="10" fill="#15803d" text-anchor="middle">q10</text>
+                </svg>
+            </div>
+
+            <h3 class="highlight">Autómata de Placas</h3>
+            <div class="fsm-box">
+Estados:
+- q0-q2: Espera 3 letras iniciales (LLL)
+- q3: Espera '-' opcional o primer número
+- q4-q6: Espera 3 números finales (000)
+- q7: Estado de aceptación (acepta L o D final, ej: AAA-000, AAA-00C)
+Aceptación: Longitud total 6 o 7 caracteres.
+            </div>
+
+            <h4>Diagrama de Transición (DFA Placa)</h4>
+            <div class="diagram-container">
+                <svg viewBox="0 0 850 180" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+                    </marker>
+                  </defs>
+                  
+                  <!-- Transiciones -->
+                  <!-- q0 -> q1 -->
+                  <path d="M 50 100 L 150 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="100" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">L</text>
+                  
+                  <!-- q1 -> q2 -->
+                  <path d="M 150 100 L 250 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="200" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">L</text>
+                  
+                  <!-- q2 -> q3 -->
+                  <path d="M 250 100 L 350 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="300" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">L</text>
+                  
+                  <!-- q3 -> q4 -->
+                  <path d="M 350 100 Q 400 45 450 50" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="390" y="60" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">-</text>
+                  
+                  <!-- q3 -> q5 (directo D) -->
+                  <path d="M 350 100 L 550 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="450" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">D</text>
+                  
+                  <!-- q4 -> q5 -->
+                  <path d="M 450 50 Q 500 55 550 100" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="510" y="60" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">D</text>
+                  
+                  <!-- q5 -> q6 -->
+                  <path d="M 550 100 L 650 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="600" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">D</text>
+                  
+                  <!-- q6 -> q7 -->
+                  <path d="M 650 100 L 750 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="700" y="90" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">D | L</text>
+                  
+                  <!-- Indicador de Inicio -->
+                  <path d="M 15 100 L 30 100" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+                  
+                  <!-- Nodos / Estados -->
+                  <!-- q0 -->
+                  <circle cx="50" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="50" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q0</text>
+                  
+                  <!-- q1 -->
+                  <circle cx="150" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="150" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q1</text>
+                  
+                  <!-- q2 -->
+                  <circle cx="250" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="250" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q2</text>
+                  
+                  <!-- q3 -->
+                  <circle cx="350" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="350" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q3</text>
+                  
+                  <!-- q4 -->
+                  <circle cx="450" cy="50" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="450" y="55" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle">q4</text>
+                  
+                  <!-- q5 -->
+                  <circle cx="550" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="550" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q5</text>
+                  
+                  <!-- q6 -->
+                  <circle cx="650" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                  <text x="650" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q6</text>
+                  
+                  <!-- q7 (Aceptación) -->
+                  <circle cx="750" cy="100" r="20" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
+                  <circle cx="750" cy="100" r="16" fill="none" stroke="#22c55e" stroke-width="1.5" />
+                  <text x="750" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#15803d" text-anchor="middle">q7</text>
+                </svg>
+            </div>
+
+            <h3 class="highlight">Autómata de Contraseña</h3>
+            <div class="fsm-box">
+Estados:
+- q0: Inicio (Espera cualquier carácter excepto espacio)
+- q1: Validando longitud inicial (&lt; 8 caracteres)
+- q2: Estado de Aceptación (Longitud entre 8 y 32 caracteres)
+- q_err: Estado de error (Espacio detectado o longitud &gt; 32)
+            </div>
+            <h4>Diagrama de Transición (DFA Contraseña)</h4>
+            <div class="diagram-container">
+                <svg viewBox="0 0 500 220" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
+                    </marker>
+                  </defs>
+                  
+                  <!-- Transiciones -->
+                  <!-- q0 -> q1 -->
+                  <path d="M 50 100 L 180 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="115" y="90" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">[a-z]|[A-Z]|[0-9]|[sym]</text>
+
+                  <!-- q1 -> q1 self loop -->
+                  <path d="M 170 80 A 15 15 0 1 1 190 80" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="180" y="45" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">[a-z]|[A-Z]|[0-9]|[sym]</text>
+
+                  <!-- q1 -> q2 -->
+                  <path d="M 180 100 L 330 100" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="255" y="90" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">long &gt;= 8</text>
+
+                  <!-- q2 -> q2 self loop -->
+                  <path d="M 320 80 A 15 15 0 1 1 340 80" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="330" y="45" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">[a-z]|[A-Z]|[0-9]|[sym]</text>
+
+                  <!-- q1 -> q_err -->
+                  <path d="M 180 120 L 255 170" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="210" y="150" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">[\s]</text>
+
+                  <!-- q2 -> q_err -->
+                  <path d="M 330 120 L 255 170" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" />
+                  <text x="300" y="150" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">[\s] | &gt;32</text>
+
+                  <!-- Indicador de Inicio -->
+                  <path d="M 15 100 L 30 100" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+
+                  <!-- Nodos / Estados -->
+                  <circle cx="50" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="50" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q0</text>
+                  <circle cx="180" cy="100" r="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="180" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">q1</text>
+                  
+                  <circle cx="330" cy="100" r="20" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
+                  <circle cx="330" cy="100" r="16" fill="none" stroke="#22c55e" stroke-width="1.5" />
+                  <text x="330" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="#15803d" text-anchor="middle">q2</text>
+                  
+                  <circle cx="255" cy="170" r="20" fill="#ef4444" fill-opacity="0.1" stroke="#ef4444" stroke-width="2" /><text x="255" y="175" font-family="sans-serif" font-size="12" font-weight="bold" fill="#b91c1c" text-anchor="middle">q_err</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>2. Arquitectura de Software</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Frontend (Streamlit)</h3>
+                <p>Interfaz reactiva que consume el motor de autómatas mediante llamadas directas a funciones puras.</p>
+            </div>
+            <div class="card">
+                <h3>Pipeline (Middleware)</h3>
+                <p>Encargado de la tokenización inteligente de textos crudos antes de la validación individual.</p>
+            </div>
+            <div class="card">
+                <h3>Core (DFA Engine)</h3>
+                <p>Implementación de bajo nivel de las máquinas de estados finitos.</p>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>
