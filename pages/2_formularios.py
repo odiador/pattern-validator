@@ -78,6 +78,7 @@ REGLAS = {
         "Longitud: 8 a 32 caracteres",
         "Al menos: 1 mayuscula, 1 minuscula, 1 numero y 1 caracter especial",
         "No permite espacios",
+        "Símbolos permitidos: ! @ # $ % ^ & * ( ) - _ = + [ ] { } ; : , . ? / \\ | ~",
     ],
 }
 
@@ -111,8 +112,15 @@ def _faltantes_password(valor: str) -> list[str]:
         faltantes.append("al menos 1 mayuscula")
     if not any(c.isdigit() for c in valor):
         faltantes.append("al menos 1 numero")
+
+    permitidos = set("!@#$%^&*()-_=+[]{};:,.?/\\|~")
     if not any((not c.isalnum()) for c in valor):
         faltantes.append("al menos 1 caracter especial")
+
+    invalidos = sorted({c for c in valor if (not c.isalnum()) and (not c.isspace()) and (c not in permitidos)})
+    if invalidos:
+        faltantes.append("use solo símbolos permitidos (ej: ! @ # $ % ^ & * ( ) - _ = + [ ] { } ; : , . ? / \\ | ~)")
+
     return faltantes
 
 

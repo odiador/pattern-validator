@@ -17,7 +17,11 @@ import re
 
 _EMAIL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*@[A-Za-z0-9-]+(?:\.[A-Za-z]{2,24})+$")
 _PLACA_RE = re.compile(r"^[A-Za-z]{3}-?(?:\d{3}|\d{2}[A-Za-z])$")
-_PASSWORD_RE = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{8,32}$")
+# Símbolos permitidos (alineado con el motor FSM)
+_PASSWORD_SPECIALS = r"!@#$%^&*()\-_=+\[\]{};:,.?/\\|~"
+_PASSWORD_RE = re.compile(
+    rf"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[{_PASSWORD_SPECIALS}])[A-Za-z0-9{_PASSWORD_SPECIALS}]{{8,32}}$"
+)
 _FECHA_RE = re.compile(r"^(\d{2})([/-])(\d{2})\2(\d{4})$")
 
 
