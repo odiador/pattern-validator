@@ -194,19 +194,56 @@ def _hints(campo_key: str, valor: str) -> list[str]:
         return hints
 
     if campo_key == "fecha":
-        if "/" not in valor and "-" not in valor:
+        # Validar balance de paréntesis en la vista previa del formulario
+        abiertos = 0
+        for c in valor:
+            if c == "(":
+                abiertos += 1
+            elif c == ")":
+                abiertos -= 1
+                if abiertos < 0:
+                    hints.append("parentesis no estan balanceados")
+                    return hints
+        if abiertos != 0:
+            hints.append("parentesis no estan balanceados")
+            return hints
+        
+        # Analizar el contenido sin paréntesis
+        valor_limpio = "".join(c for c in valor if c not in ["(", ")"])
+        
+        if "/" not in valor_limpio and "-" not in valor_limpio:
             hints.append("use separador '/' o '-'")
             return hints
-        sep = "/" if "/" in valor else "-"
-        partes = valor.split(sep)
+        
+        sep = "/" if "/" in valor_limpio else "-"
+        partes = valor_limpio.split(sep)
         if len(partes) != 3:
             hints.append("use formato DD/MM/AAAA o DD-MM-AAAA")
             return hints
+        
         d, m, a = partes
         if not (d.isdigit() and m.isdigit() and a.isdigit()):
             hints.append("use solo numeros en dia/mes/anio")
+            return hints
+            
         if len(a) != 4:
             hints.append("anio debe tener 4 digitos")
+            
+        # Validación de rango numérico coherente con calendario
+        d_i, m_i, a_i = int(d), int(m), int(a)
+        if m_i < 1 or m_i > 12:
+            hints.append("mes debe estar entre 01 y 12")
+        if d_i < 1:
+            hints.append("dia debe ser mayor a 0")
+            
+        if 1 <= m_i <= 12 and d_i >= 1:
+            def es_bisiesto(valor_anio: int) -> bool:
+                return (valor_anio % 4 == 0 and valor_anio % 100 != 0) or (valor_anio % 400 == 0)
+            dias_por_mes = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            if m_i == 2 and es_bisiesto(a_i):
+                dias_por_mes[1] = 29
+            if d_i > dias_por_mes[m_i - 1]:
+                hints.append(f"dia invalido para el mes especificado (max {dias_por_mes[m_i - 1]} dias)")
         return hints
 
     return hints

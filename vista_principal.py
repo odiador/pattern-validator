@@ -268,7 +268,7 @@ Sugerencia de demo (5–8 min):
 
     with tab_fecha:
         st.markdown("### Autómata de Fecha")
-        st.caption("Acepta fechas en formato DD/MM/AAAA o DD-MM-AAAA, admitiendo paréntesis balanceados. Adicionalmente, el motor valida restricciones de meses y años bisiestos.")
+        st.caption("Acepta fechas en formato DD/MM/AAAA o DD-MM-AAAA, admitiendo paréntesis balanceados. Las transiciones de paréntesis '(' y ')' se representan como bucles sobre los estados correspondientes, y adicionalmente el motor valida la cantidad de días del mes e inclusive años bisiestos.")
         dot_fecha = """digraph FechaFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -295,6 +295,19 @@ Sugerencia de demo (5–8 min):
  q7 -> q8 [label="D"];
  q8 -> q9 [label="D"];
  q9 -> q10 [label="D"];
+
+ // Autoreferencias para paréntesis balanceados
+ q0 -> q0 [label="("];
+ q1 -> q1 [label="( | )"];
+ q2 -> q2 [label="( | )"];
+ q3 -> q3 [label="( | )"];
+ q4 -> q4 [label="( | )"];
+ q5 -> q5 [label="( | )"];
+ q6 -> q6 [label="( | )"];
+ q7 -> q7 [label="( | )"];
+ q8 -> q8 [label="( | )"];
+ q9 -> q9 [label="( | )"];
+ q10 -> q10 [label=")"];
 }
 """
         st.graphviz_chart(dot_fecha)

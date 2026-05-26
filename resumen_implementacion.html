@@ -394,24 +394,21 @@ Lógica Secuencial:
                   <circle cx="450" cy="150" r="20" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
                   <circle cx="450" cy="150" r="16" fill="none" stroke="#22c55e" stroke-width="1.5" />
                   <text x="450" y="155" font-family="sans-serif" font-size="12" font-weight="bold" fill="#15803d" text-anchor="middle">q5</text>
-                </svg>
-            </div>
-
-            <h3 class="highlight">Autómata de Fechas</h3>
+                <h3 class="highlight">Autómata de Fechas</h3>
             <div class="fsm-box">
 Estados y Transición Secuencial (FSM pura):
-- q0: Estado inicial.
-- q_d1, q_d2: Estados para leer los dos dígitos del día (DD).
+- q0: Estado inicial. Admite '(' vía bucle.
+- q_d1, q_d2: Estados para leer los dos dígitos del día (DD). Admite '(' y ')' en bucle.
 - q_s1: Estado tras leer el separador '/' o '-'.
-- q_m1, q_m2: Estados para leer los dos dígitos del mes (MM).
+- q_m1, q_m2: Estados para leer los dos dígitos del mes (MM). Admite '(' y ')' en bucle.
 - q_s2: Estado tras leer el segundo separador (debe coincidir con el primero).
 - q_y1 a q_y4: Estados secuenciales para los cuatro dígitos del año (AAAA).
-- q_y4: Estado de Aceptación final.
-* Nota: Se permite el uso de paréntesis '(' y ')' en cualquier posición siempre que estén correctamente balanceados.
+- q_y4 (q10): Estado de Aceptación final. Admite ')' vía bucle.
+* Nota: Se permite el uso de paréntesis '(' y ')' en cualquier posición siempre que estén correctamente balanceados. El motor valida adicionalmente que la cantidad de días sea correcta según el mes y si el año es bisiesto.
             </div>
             <h4>Diagrama de Transición (DFA Fecha)</h4>
             <div class="diagram-container">
-                <svg viewBox="0 0 1000 120" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 1000 130" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
                   <defs>
                     <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                       <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb" />
@@ -419,35 +416,41 @@ Estados y Transición Secuencial (FSM pura):
                   </defs>
                   
                   <!-- Transiciones -->
-                  <path d="M 50 60 L 130 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="90" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
-                  <path d="M 130 60 L 210 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="170" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
-                  <path d="M 210 60 L 290 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="250" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">/ | -</text>
-                  <path d="M 290 60 L 370 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="330" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
-                  <path d="M 370 60 L 450 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="410" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
-                  <path d="M 450 60 L 530 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="490" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">/ | -</text>
-                  <path d="M 530 60 L 610 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="570" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
-                  <path d="M 610 60 L 690 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="650" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
-                  <path d="M 690 60 L 770 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="730" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
-                  <path d="M 770 60 L 850 60" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="810" y="50" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
-
+                  <path d="M 50 70 L 130 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="90" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 130 70 L 210 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="170" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 210 70 L 290 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="250" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">/ | -</text>
+                  <path d="M 290 70 L 370 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="330" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 370 70 L 450 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="410" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 450 70 L 530 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="490" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">/ | -</text>
+                  <path d="M 530 70 L 610 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="570" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 610 70 L 690 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="650" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 690 70 L 770 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="730" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+                  <path d="M 770 70 L 850 70" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)" /><text x="810" y="60" font-family="sans-serif" font-weight="bold" font-size="12" fill="#1e293b">D</text>
+ 
                   <!-- Indicador de Inicio -->
-                  <path d="M 15 60 L 30 60" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
-
+                  <path d="M 15 70 L 30 70" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+ 
+                  <!-- Bucles de Paréntesis -->
+                  <path d="M 45 56 A 8 8 0 1 1 55 56" fill="none" stroke="#2563eb" stroke-width="1.5" /><text x="50" y="42" font-family="sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">(</text>
+                  <path d="M 285 56 A 8 8 0 1 1 295 56" fill="none" stroke="#2563eb" stroke-width="1.5" /><text x="290" y="42" font-family="sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">( | )</text>
+                  <path d="M 525 56 A 8 8 0 1 1 535 56" fill="none" stroke="#2563eb" stroke-width="1.5" /><text x="530" y="42" font-family="sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">( | )</text>
+                  <path d="M 845 56 A 8 8 0 1 1 855 56" fill="none" stroke="#22c55e" stroke-width="1.5" /><text x="850" y="42" font-family="sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">)</text>
+ 
                   <!-- Nodos / Estados -->
-                  <circle cx="50" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="50" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q0</text>
-                  <circle cx="130" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="130" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q1</text>
-                  <circle cx="210" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="210" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q2</text>
-                  <circle cx="290" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="290" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q3</text>
-                  <circle cx="370" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="370" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q4</text>
-                  <circle cx="450" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="450" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q5</text>
-                  <circle cx="530" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="530" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q6</text>
-                  <circle cx="610" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="610" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q7</text>
-                  <circle cx="690" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="690" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q8</text>
-                  <circle cx="770" cy="60" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="770" y="64" font-family="sans-serif" font-size="10" text-anchor="middle">q9</text>
+                  <circle cx="50" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="50" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q0</text>
+                  <circle cx="130" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="130" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q1</text>
+                  <circle cx="210" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="210" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q2</text>
+                  <circle cx="290" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="290" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q3</text>
+                  <circle cx="370" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="370" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q4</text>
+                  <circle cx="450" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="450" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q5</text>
+                  <circle cx="530" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="530" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q6</text>
+                  <circle cx="610" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="610" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q7</text>
+                  <circle cx="690" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="690" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q8</text>
+                  <circle cx="770" cy="70" r="16" fill="#ffffff" stroke="#2563eb" stroke-width="2" /><text x="770" y="74" font-family="sans-serif" font-size="10" text-anchor="middle">q9</text>
                   
-                  <circle cx="850" cy="60" r="16" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
-                  <circle cx="850" cy="60" r="12" fill="none" stroke="#22c55e" stroke-width="1.5" />
-                  <text x="850" y="64" font-family="sans-serif" font-size="10" fill="#15803d" text-anchor="middle">q10</text>
+                  <circle cx="850" cy="70" r="16" fill="#22c55e" fill-opacity="0.1" stroke="#22c55e" stroke-width="2" />
+                  <circle cx="850" cy="70" r="12" fill="none" stroke="#22c55e" stroke-width="1.5" />
+                  <text x="850" y="74" font-family="sans-serif" font-size="10" fill="#15803d" text-anchor="middle">q10</text>
                 </svg>
             </div>
 
