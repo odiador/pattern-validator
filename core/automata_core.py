@@ -180,26 +180,20 @@ def validar_fecha(fecha: str) -> bool:
 
 
 def validar_telefono(telefono: str) -> bool:
-    """Valida teléfonos en Colombia usando un DFA paso a paso: opcional +57, inicia con 3 y tiene exactamente 10 dígitos."""
+    """Valida teléfonos en Colombia usando un DFA estructurado y determinista (sin bucles infinitos de separadores)."""
     if not telefono:
         return False
 
     estado = "q0"
-    digitos = 0
 
     for char in telefono:
-        # Los separadores no alteran el conteo de dígitos y se permiten en cualquier posición
-        if char in [" ", "-", ".", "(", ")"]:
-            if estado in ["qp1", "qp2"]:
-                return False  # No permitimos separadores dentro del prefijo "+57"
-            continue
-
         if estado == "q0":
             if char == "+":
                 estado = "qp1"
+            elif char == "(":
+                estado = "q_p3_1"
             elif char == "3":
                 estado = "qd1"
-                digitos = 1
             else:
                 return False
         elif estado == "qp1":
@@ -213,24 +207,113 @@ def validar_telefono(telefono: str) -> bool:
             else:
                 return False
         elif estado == "qp3":
-            if char == "3":
+            if char == " ":
+                estado = "qp3_space"
+            elif char == "(":
+                estado = "q_p3_1"
+            elif char == "3":
                 estado = "qd1"
-                digitos = 1
             else:
                 return False
-        elif estado.startswith("qd"):
+        elif estado == "qp3_space":
+            if char == "(":
+                estado = "q_p3_1"
+            elif char == "3":
+                estado = "qd1"
+            else:
+                return False
+        elif estado == "q_p3_1":
+            if char == "3":
+                estado = "qd1_p"
+            else:
+                return False
+        elif estado == "qd1_p":
             if _es_digito_ascii(char):
-                digitos += 1
-                if digitos <= 10:
-                    estado = f"qd{digitos}"
-                else:
-                    return False  # Excede los 10 dígitos obligatorios
+                estado = "qd2_p"
             else:
                 return False
+        elif estado == "qd2_p":
+            if _es_digito_ascii(char):
+                estado = "qd3_p"
+            else:
+                return False
+        elif estado == "qd3_p":
+            if char == ")":
+                estado = "qd3"
+            else:
+                return False
+        elif estado == "qd1":
+            if _es_digito_ascii(char):
+                estado = "qd2"
+            else:
+                return False
+        elif estado == "qd2":
+            if _es_digito_ascii(char):
+                estado = "qd3"
+            else:
+                return False
+        elif estado == "qd3":
+            if char in [" ", "-", "."]:
+                estado = "q_sep1"
+            elif _es_digito_ascii(char):
+                estado = "qd4"
+            else:
+                return False
+        elif estado == "q_sep1":
+            if _es_digito_ascii(char):
+                estado = "qd4"
+            else:
+                return False
+        elif estado == "qd4":
+            if _es_digito_ascii(char):
+                estado = "qd5"
+            else:
+                return False
+        elif estado == "qd5":
+            if _es_digito_ascii(char):
+                estado = "qd6"
+            else:
+                return False
+        elif estado == "qd6":
+            if char in [" ", "-", "."]:
+                estado = "q_sep2"
+            elif _es_digito_ascii(char):
+                estado = "qd7"
+            else:
+                return False
+        elif estado == "q_sep2":
+            if _es_digito_ascii(char):
+                estado = "qd7"
+            else:
+                return False
+        elif estado == "qd7":
+            if _es_digito_ascii(char):
+                estado = "qd8"
+            else:
+                return False
+        elif estado == "qd8":
+            if char in [" ", "-", "."]:
+                estado = "q_sep3"
+            elif _es_digito_ascii(char):
+                estado = "qd9"
+            else:
+                return False
+        elif estado == "q_sep3":
+            if _es_digito_ascii(char):
+                estado = "qd9"
+            else:
+                return False
+        elif estado == "qd9":
+            if _es_digito_ascii(char):
+                estado = "qd10"
+            else:
+                return False
+        elif estado == "qd10":
+            return False  # No se permiten más caracteres después del décimo dígito
         else:
             return False
 
-    return estado == "qd10" and digitos == 10
+    return estado == "qd10"
 
 
 def validar_url(url: str) -> bool:

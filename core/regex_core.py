@@ -44,19 +44,15 @@ def validar_telefono(telefono: str) -> bool:
         return False
 
     valor = telefono.strip()
-    if any(c.isalpha() for c in valor):
-        return False
-
-    # Permitimos +, espacios, guiones, puntos y parentesis.
-    if re.fullmatch(r"[0-9+().\-\s]+", valor) is None:
-        return False
-
-    digitos = "".join(re.findall(r"\d", valor))
-    if len(digitos) == 10:
-        return digitos.startswith("3")
-    elif len(digitos) == 12:
-        return digitos.startswith("573")
-    return False
+    # Expresión regular estructurada para coincidir con la FSM:
+    # 1. Prefijo +57 (opcional) con espacio opcional
+    # 2. Grupo 1: (3XX) o 3XX
+    # 3. Separador 1 (opcional: espacio, punto o guion)
+    # 4. Grupo 2: 3 dígitos
+    # 5. Separador 2 (opcional: espacio, punto o guion)
+    # 6. Grupo 3: 4 dígitos (con posible separador opcional en el medio DD-DD)
+    patron = r"^(?:\+57\s?)?(?:\(3\d{2}\)|3\d{2})[\s.-]?\d{3}[\s.-]?(?:\d{2}[\s.-]?\d{2}|\d{4})$"
+    return re.fullmatch(patron, valor) is not None
 
 
 def validar_fecha(fecha: str) -> bool:

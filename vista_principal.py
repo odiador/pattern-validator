@@ -186,7 +186,7 @@ Para evidenciar el Módulo B:
 
     with tab_telefono:
         st.markdown("### Autómata de Teléfono (Colombia)")
-        st.caption("Valida números de teléfono en Colombia: opcional prefijo +57, número de exactamente 10 dígitos iniciando obligatoriamente con 3. Admite caracteres extras de separación [espacio, guion, punto, paréntesis] representados por bucles de autorreferencia en los estados correspondientes.")
+        st.caption("Valida números de teléfono en Colombia de forma estructurada: opcional prefijo +57, seguido opcionalmente de un código de área entre paréntesis (3XX) o sin ellos 3XX, separadores estructurados de grupos [espacio, punto o guion] y una división final opcional (DD-DD).")
         dot_telefono = """digraph TelefonoColFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -195,46 +195,70 @@ Para evidenciar el Módulo B:
  qp1 [label="qp1 (+)"];
  qp2 [label="qp2 (5)"];
  qp3 [label="qp3 (7)"];
+ qp3_sp [label="qp3_sp (Espacio)"];
+ 
+ qp3_1 [label="qp3_1 (Open)"];
+ qd1_p [label="qd1_p (3)"];
+ qd2_p [label="qd2_p (D)"];
+ qd3_p [label="qd3_p (D)"];
+ 
  qd1 [label="qd1 (3)"];
- qd2 [label="qd2"];
- qd3 [label="qd3"];
- qd4 [label="qd4"];
- qd5 [label="qd5"];
- qd6 [label="qd6"];
- qd7 [label="qd7"];
- qd8 [label="qd8"];
- qd9 [label="qd9"];
+ qd2 [label="qd2 (D)"];
+ qd3 [label="qd3 (D)"];
+ 
+ q_s1 [label="q_s1 ([- .])"];
+ qd4 [label="qd4 (D)"];
+ qd5 [label="qd5 (D)"];
+ qd6 [label="qd6 (D)"];
+ 
+ q_s2 [label="q_s2 ([- .])"];
+ qd7 [label="qd7 (D)"];
+ qd8 [label="qd8 (D)"];
+ 
+ q_s3 [label="q_s3 ([- .])"];
+ qd9 [label="qd9 (D)"];
  qd10 [shape=doublecircle, label="qd10 (Acepta)"];
 
  q0 -> qp1 [label="+"];
  qp1 -> qp2 [label="5"];
  qp2 -> qp3 [label="7"];
+ 
+ qp3 -> qp3_sp [label="espacio"];
+ qp3 -> qp3_1 [label="("];
  qp3 -> qd1 [label="3"];
+ 
+ qp3_sp -> qp3_1 [label="("];
+ qp3_sp -> qd1 [label="3"];
+ 
+ q0 -> qp3_1 [label="("];
  q0 -> qd1 [label="3"];
-
+ 
+ qp3_1 -> qd1_p [label="3"];
+ qd1_p -> qd2_p [label="D"];
+ qd2_p -> qd3_p [label="D"];
+ qd3_p -> qd3 [label=")"];
+ 
  qd1 -> qd2 [label="D"];
  qd2 -> qd3 [label="D"];
+ 
+ qd3 -> q_s1 [label="[- .]"];
  qd3 -> qd4 [label="D"];
+ q_s1 -> qd4 [label="D"];
+ 
  qd4 -> qd5 [label="D"];
  qd5 -> qd6 [label="D"];
+ 
+ qd6 -> q_s2 [label="[- .]"];
  qd6 -> qd7 [label="D"];
+ q_s2 -> qd7 [label="D"];
+ 
  qd7 -> qd8 [label="D"];
+ 
+ qd8 -> q_s3 [label="[- .]"];
  qd8 -> qd9 [label="D"];
+ q_s3 -> qd9 [label="D"];
+ 
  qd9 -> qd10 [label="D"];
-
- // Bucles de autorreferencia para caracteres extras de separación
- q0 -> q0 [label="[ - . ( )]"];
- qp3 -> qp3 [label="[ - . ( )]"];
- qd1 -> qd1 [label="[ - . ( )]"];
- qd2 -> qd2 [label="[ - . ( )]"];
- qd3 -> qd3 [label="[ - . ( )]"];
- qd4 -> qd4 [label="[ - . ( )]"];
- qd5 -> qd5 [label="[ - . ( )]"];
- qd6 -> qd6 [label="[ - . ( )]"];
- qd7 -> qd7 [label="[ - . ( )]"];
- qd8 -> qd8 [label="[ - . ( )]"];
- qd9 -> qd9 [label="[ - . ( )]"];
- qd10 -> qd10 [label="[ - . ( )]"];
 }
 """
         st.graphviz_chart(dot_telefono)
