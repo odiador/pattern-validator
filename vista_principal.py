@@ -13,12 +13,10 @@ def _render_cover(logo_base64: str) -> None:
     template_path = Path(__file__).with_name("vista_principal_template.html")
     template = template_path.read_text(encoding="utf-8")
     html = template.replace("{{LOGO_BASE64}}", logo_base64)
-    st.markdown(html, unsafe_allow_html=True)
+    st.html(html)
 
 
 logo_b64 = _img_base64("UQ.png")
-
-st.markdown('<div class="vista-principal">', unsafe_allow_html=True)
 
 _render_cover(logo_b64)
 
@@ -49,4 +47,3 @@ Use el menú lateral para acceder a las secciones.
 """
 )
 
-st.markdown("</div>", unsafe_allow_html=True)
