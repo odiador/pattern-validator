@@ -186,7 +186,7 @@ Para evidenciar el Módulo B:
 
     with tab_telefono:
         st.markdown("### Autómata de Teléfono (Colombia)")
-        st.caption("Valida números de teléfono en Colombia: opcional prefijo +57, número de exactamente 10 dígitos iniciando obligatoriamente con 3.")
+        st.caption("Valida números de teléfono en Colombia: opcional prefijo +57, número de exactamente 10 dígitos iniciando obligatoriamente con 3. Admite caracteres extras de separación [espacio, guion, punto, paréntesis] representados por bucles de autorreferencia en los estados correspondientes.")
         dot_telefono = """digraph TelefonoColFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -221,6 +221,20 @@ Para evidenciar el Módulo B:
  qd7 -> qd8 [label="D"];
  qd8 -> qd9 [label="D"];
  qd9 -> qd10 [label="D"];
+
+ // Bucles de autorreferencia para caracteres extras de separación
+ q0 -> q0 [label="[ - . ( )]"];
+ qp3 -> qp3 [label="[ - . ( )]"];
+ qd1 -> qd1 [label="[ - . ( )]"];
+ qd2 -> qd2 [label="[ - . ( )]"];
+ qd3 -> qd3 [label="[ - . ( )]"];
+ qd4 -> qd4 [label="[ - . ( )]"];
+ qd5 -> qd5 [label="[ - . ( )]"];
+ qd6 -> qd6 [label="[ - . ( )]"];
+ qd7 -> qd7 [label="[ - . ( )]"];
+ qd8 -> qd8 [label="[ - . ( )]"];
+ qd9 -> qd9 [label="[ - . ( )]"];
+ qd10 -> qd10 [label="[ - . ( )]"];
 }
 """
         st.graphviz_chart(dot_telefono)
@@ -255,7 +269,7 @@ Para evidenciar el Módulo B:
 
     with tab_fecha:
         st.markdown("### Autómata de Fecha")
-        st.caption("Acepta fechas en formato DD/MM/AAAA o DD-MM-AAAA, admitiendo paréntesis balanceados. Las transiciones de paréntesis '(' y ')' se representan como bucles sobre los estados correspondientes, y adicionalmente el motor valida la cantidad de días del mes e inclusive años bisiestos.")
+        st.caption("Acepta fechas en formato DD/MM/AAAA o DD-MM-AAAA, admitiendo paréntesis balanceados. Las transiciones de paréntesis '(' y ')' se representan como bucles sobre los estados correspondientes, y adicionalmente el autómata evalúa la cantidad de días del mes e inclusive años bisiestos bifurcando a un estado de rechazo o aceptación.")
         dot_fecha = """digraph FechaFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
@@ -270,7 +284,9 @@ Para evidenciar el Módulo B:
  q7 [label="q7 (A1)"];
  q8 [label="q8 (A2)"];
  q9 [label="q9 (A3)"];
- q10 [shape=doublecircle, label="q10 (Acepta)"];
+ q10 [label="q10 (A4)"];
+ q_val [shape=doublecircle, label="q_val (Acepta - Coherente)"];
+ q_rej [shape=circle, color=red, label="q_rej (Rechaza - Incoherente)"];
 
  q0 -> q1 [label="D"];
  q1 -> q2 [label="D"];
@@ -283,6 +299,9 @@ Para evidenciar el Módulo B:
  q8 -> q9 [label="D"];
  q9 -> q10 [label="D"];
 
+ q10 -> q_val [label="[Calendario Valido]\\n(días <= max_mes, bisiestos)"];
+ q10 -> q_rej [label="[Calendario Invalido]\\n(ej: 31/04/2025 o 29/02/2023)"];
+
  // Autoreferencias para paréntesis balanceados
  q0 -> q0 [label="("];
  q1 -> q1 [label="( | )"];
@@ -294,7 +313,8 @@ Para evidenciar el Módulo B:
  q7 -> q7 [label="( | )"];
  q8 -> q8 [label="( | )"];
  q9 -> q9 [label="( | )"];
- q10 -> q10 [label=")"];
+ q10 -> q10 [label="( | )"];
+ q_val -> q_val [label=")"];
 }
 """
         st.graphviz_chart(dot_fecha)
