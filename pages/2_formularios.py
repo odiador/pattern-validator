@@ -231,23 +231,23 @@ col1, col2 = st.columns(2, gap="large")
 
 with col1:
     correo = st.text_input("Correo electronico", key="correo")
-    render_feedback("correo", correo, validar_correo)
+    render_feedback("correo", correo, validadores["correo"])
 
     telefono = st.text_input("Telefono", key="telefono")
-    render_feedback("telefono", telefono, validar_telefono)
+    render_feedback("telefono", telefono, validadores["telefono"])
 
     fecha = st.text_input("Fecha (DD/MM/AAAA o DD-MM-AAAA)", key="fecha")
-    render_feedback("fecha", fecha, validar_fecha)
+    render_feedback("fecha", fecha, validadores["fecha"])
 
 with col2:
     url = st.text_input("URL (http o https)", key="url")
-    render_feedback("url", url, validar_url)
+    render_feedback("url", url, validadores["url"])
 
     placa = st.text_input("Placa de vehiculo", key="placa")
-    render_feedback("placa", placa, validar_placa)
+    render_feedback("placa", placa, validadores["placa"])
 
     password = st.text_input("Contrasena", type="password", key="contrasena")
-    render_feedback("contrasena", password, validar_password)
+    render_feedback("contrasena", password, validadores["contrasena"])
 
 resultados = [
     evaluar(key, st.session_state.get(key, ""), validador, st.session_state["touched"].get(key, False))
