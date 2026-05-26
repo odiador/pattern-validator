@@ -1,23 +1,3 @@
-<p align="center">
-  <img src="./UQ.png" alt="Universidad del Quindío" width="180" />
-</p>
-
-# Documentación Técnica: Sistema de Validación y Extracción de Patrones Basado en Máquinas de Estados Finitos (FSM)
-
-Juan Manuel Amador Roa
-
-Valeria Florez Paz
-
-Presentado a: Ana María Tamayo
-
-Universidad del Quindío  
-Facultad de Ingeniería  
-Programa Ingenieria de Sistemas y Computación  
-Teoría de lenguajes formales  
-Armenia- 2026
-
----
-
 # Manual del Usuario y Documentación Técnica
 
 ## 1. Introducción

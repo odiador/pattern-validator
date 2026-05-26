@@ -5,6 +5,30 @@ st.set_page_config(
     layout="wide",
 )
 
+logo_col1, logo_col2, logo_col3 = st.columns([1, 2, 1])
+with logo_col2:
+    st.image("UQ.png", width=180)
+
+st.markdown(
+    """
+# Documentación Técnica: Sistema de Validación y Extracción de Patrones Basado en Máquinas de Estados Finitos (FSM)
+
+Juan Manuel Amador Roa
+
+Valeria Florez Paz
+
+Presentado a: Ana María Tamayo
+
+Universidad del Quindío  
+Facultad de Ingeniería  
+Programa Ingenieria de Sistemas y Computación  
+Teoría de lenguajes formales  
+Armenia- 2026
+"""
+)
+
+st.divider()
+
 st.title("Validador de patrones con automatas finitos")
 
 st.markdown(
