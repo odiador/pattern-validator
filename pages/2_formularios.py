@@ -11,8 +11,6 @@ st.markdown(
 Ingrese los datos y valide su estructura mediante automatas finitos.
 
 Este modulo no utiliza expresiones regulares. La validacion se actualiza automaticamente mientras escribe.
-
-Nota: dependiendo del navegador, algunos campos confirman el cambio al salir del input (Tab/clic fuera) en lugar de cada tecla.
 """
 )
 

@@ -143,58 +143,17 @@ Para evidenciar el Módulo B:
     )
     st.code("make test\n# o\npytest -q", language="bash")
 
-    st.markdown("## Sustentación o presentación")
-    st.markdown(
-        """
-Sugerencia de demo (5–8 min):
-1. Mostrar portada + objetivos.
-2. Demostrar Módulo A con un texto y explicar el pipeline.
-3. Demostrar Módulo B con 2–3 campos (inválido → válido) y explicar `touched/_prev_values`.
-4. Mostrar ejecución de tests.
-"""
-    )
-
     st.markdown("## Autómatas (visuales)")
     st.caption("Seleccione la pestaña correspondiente para visualizar el diagrama de transiciones (FSM) de cada patrón.")
 
-    tab_placa, tab_correo, tab_telefono, tab_fecha, tab_url, tab_pass = st.tabs([
-        "Placa",
+    tab_correo, tab_telefono, tab_url, tab_fecha, tab_placa, tab_pass = st.tabs([
         "Correo electrónico",
         "Teléfono",
-        "Fecha",
         "URL",
+        "Fecha",
+        "Placa",
         "Contraseña"
     ])
-
-    with tab_placa:
-        st.markdown("### Autómata de Placas")
-        st.caption("Acepta formatos LLL-000, LLL000, LLL-00L, LLL00L. L = Letra, D = Dígito.")
-        dot_placa = """digraph PlacaFSM {
- rankdir=LR;
- node [shape=circle, fontsize=12];
-
- q0 [label="q0 (Inicio)"];
- q1 [label="q1 (L1)"];
- q2 [label="q2 (L2)"];
- q3 [label="q3 (L3)"];
- q4 [label="q4 (op -)"];
- q5 [label="q5 (D1)"];
- q6 [label="q6 (D2)"];
- q7 [shape=doublecircle, label="q7 (Acepta)"];
-
- q0 -> q1 [label="L"];
- q1 -> q2 [label="L"];
- q2 -> q3 [label="L"];
-
- q3 -> q4 [label="-"];
- q3 -> q5 [label="D"];
- q4 -> q5 [label="D"];
-
- q5 -> q6 [label="D"];
- q6 -> q7 [label="D | L"];
-}
-"""
-        st.graphviz_chart(dot_placa)
 
     with tab_correo:
         st.markdown("### Autómata de Correo Electrónico")
@@ -266,6 +225,34 @@ Sugerencia de demo (5–8 min):
 """
         st.graphviz_chart(dot_telefono)
 
+    with tab_url:
+        st.markdown("### Autómata de URL")
+        st.caption("Valida URLs con protocolo http:// o https://, soportando localhost, direcciones IP válidas (octetos <= 255) o dominios con TLD alfabético (2-24).")
+        dot_url = """digraph UrlFSM {
+ rankdir=LR;
+ node [shape=circle, fontsize=12];
+
+ q0 [label="q0 (Inicio)"];
+ q1 [label="q1 (http:// | https://)"];
+ q2 [label="q2 (localhost / IP)"];
+ q3 [label="q3 (Etiqueta)"];
+ q4 [label="q4 (.)"];
+ q5 [shape=doublecircle, label="q5 (Acepta TLD / IP)"];
+
+ q0 -> q1 [label="http:// | https://"];
+ q1 -> q2 [label="localhost | octeto_IP"];
+ q1 -> q3 [label="alnum"];
+
+ q3 -> q3 [label="alnum | -"];
+ q3 -> q4 [label="."];
+
+ q4 -> q5 [label="letra (2-24) | octeto_IP"];
+ q5 -> q5 [label="letra"];
+ q5 -> q4 [label="."];
+}
+"""
+        st.graphviz_chart(dot_url)
+
     with tab_fecha:
         st.markdown("### Autómata de Fecha")
         st.caption("Acepta fechas en formato DD/MM/AAAA o DD-MM-AAAA, admitiendo paréntesis balanceados. Las transiciones de paréntesis '(' y ')' se representan como bucles sobre los estados correspondientes, y adicionalmente el motor valida la cantidad de días del mes e inclusive años bisiestos.")
@@ -312,33 +299,35 @@ Sugerencia de demo (5–8 min):
 """
         st.graphviz_chart(dot_fecha)
 
-    with tab_url:
-        st.markdown("### Autómata de URL")
-        st.caption("Valida URLs con protocolo http:// o https://, soportando localhost, direcciones IP válidas (octetos <= 255) o dominios con TLD alfabético (2-24).")
-        dot_url = """digraph UrlFSM {
+    with tab_placa:
+        st.markdown("### Autómata de Placas")
+        st.caption("Acepta formatos LLL-000, LLL000, LLL-00L, LLL00L. L = Letra, D = Dígito.")
+        dot_placa = """digraph PlacaFSM {
  rankdir=LR;
  node [shape=circle, fontsize=12];
 
  q0 [label="q0 (Inicio)"];
- q1 [label="q1 (http:// | https://)"];
- q2 [label="q2 (localhost / IP)"];
- q3 [label="q3 (Etiqueta)"];
- q4 [label="q4 (.)"];
- q5 [shape=doublecircle, label="q5 (Acepta TLD / IP)"];
+ q1 [label="q1 (L1)"];
+ q2 [label="q2 (L2)"];
+ q3 [label="q3 (L3)"];
+ q4 [label="q4 (op -)"];
+ q5 [label="q5 (D1)"];
+ q6 [label="q6 (D2)"];
+ q7 [shape=doublecircle, label="q7 (Acepta)"];
 
- q0 -> q1 [label="http:// | https://"];
- q1 -> q2 [label="localhost | octeto_IP"];
- q1 -> q3 [label="alnum"];
+ q0 -> q1 [label="L"];
+ q1 -> q2 [label="L"];
+ q2 -> q3 [label="L"];
 
- q3 -> q3 [label="alnum | -"];
- q3 -> q4 [label="."];
+ q3 -> q4 [label="-"];
+ q3 -> q5 [label="D"];
+ q4 -> q5 [label="D"];
 
- q4 -> q5 [label="letra (2-24) | octeto_IP"];
- q5 -> q5 [label="letra"];
- q5 -> q4 [label="."];
+ q5 -> q6 [label="D"];
+ q6 -> q7 [label="D | L"];
 }
 """
-        st.graphviz_chart(dot_url)
+        st.graphviz_chart(dot_placa)
 
     with tab_pass:
         st.markdown("### Autómata de Contraseña")
