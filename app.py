@@ -18,6 +18,22 @@ logo_b64 = _img_base64("UQ.png")
 st.markdown(
     """
 <style>
+:root {
+  --text-color: #000000;
+}
+
+html, body {
+  color: #000000;
+}
+
+/* Texto negro en toda la app (incluye sidebar y contenido principal) */
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewContainer"] *,
+[data-testid="stSidebar"],
+[data-testid="stSidebar"] * {
+  color: #000000;
+}
+
 /* Fondo "de escritorio" para resaltar la hoja blanca */
 [data-testid="stAppViewContainer"] {
   background: #f3f4f6;
@@ -34,7 +50,7 @@ st.markdown(
   box-shadow: 0 18px 55px rgba(0,0,0,0.10);
 }
 
-.cover-page * { color: #000000 !important; }
+.cover-page * { color: #000000 !important;  }
 
 .cover-center { text-align: center; }
 .cover-title {
@@ -55,12 +71,13 @@ st.markdown(
 st.markdown(
     f"""
 <div class="cover-page">
+
+  <div class="cover-center cover-block cover-text">
+    Documentación Técnica: Sistema de Validación y Extracción de Patrones Basado en Máquinas de Estados Finitos (FSM)<br/><br/>
+  </div>
+
   <div class="cover-center">
     <img src="data:image/png;base64,{logo_b64}" alt="Universidad del Quindío" style="width:180px; height:auto;" />
-
-    <div class="cover-title">
-      Documentación Técnica: Sistema de Validación y Extracción de Patrones Basado en Máquinas de Estados Finitos (FSM)
-    </div>
   </div>
 
   <div class="cover-center cover-block cover-text">
